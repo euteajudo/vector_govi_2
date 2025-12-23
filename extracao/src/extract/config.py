@@ -100,6 +100,10 @@ class LLMConfig(BaseModel):
         default=300,
         description="Timeout em segundos"
     )
+    use_guided_json: bool = Field(
+        default=True,
+        description="Usar guided_json do vLLM para forçar JSON válido (só vLLM)"
+    )
 
     @classmethod
     def for_vllm(cls, model: str = "Qwen/Qwen3-8B-AWQ") -> "LLMConfig":

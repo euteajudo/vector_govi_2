@@ -41,11 +41,28 @@ Busca rapida (helper):
 from .config import SearchConfig, SearchMode, RerankMode
 from .models import SearchHit, SearchResult, SearchFilter
 from .hybrid_searcher import HybridSearcher, search
+from .contextual_retriever import (
+    ContextualRetriever,
+    RetrievalStrategy,
+    RetrievedChunk,
+    RetrievalResult,
+    RetrieverConfig,
+    CitationValidator,
+    AnswerValidation,
+)
 
 __all__ = [
     # Principal
     "HybridSearcher",
     "search",
+    # Contextual Retriever (parent-child + MMR)
+    "ContextualRetriever",
+    "RetrievalStrategy",
+    "RetrievedChunk",
+    "RetrievalResult",
+    "RetrieverConfig",
+    "CitationValidator",
+    "AnswerValidation",
     # Configuracao
     "SearchConfig",
     "SearchMode",

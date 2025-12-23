@@ -23,6 +23,7 @@ Exemplo de uso:
 """
 
 import json
+import logging
 import re
 from pathlib import Path
 from typing import TypeVar, Generic, Optional, Any, Union
@@ -33,6 +34,8 @@ from pydantic import BaseModel
 from openai import OpenAI
 
 from .config import ExtractConfig, ExtractMode, ChunkMode, LLMProvider
+
+logger = logging.getLogger(__name__)
 
 
 # Type variable para o schema
@@ -516,6 +519,19 @@ class Extractor:
             timeout=config.llm.timeout,
         )
 
+    def _get_vllm_client(self, config: ExtractConfig):
+        """Retorna cliente VLLMClient para uso com guided_json."""
+        from llm.vllm_client import VLLMClient, LLMConfig as VLLMConfig
+
+        vllm_config = VLLMConfig(
+            base_url=config.llm.base_url,
+            model=config.llm.model,
+            temperature=config.llm.temperature,
+            max_tokens=config.llm.max_tokens,
+            timeout=float(config.llm.timeout),
+        )
+        return VLLMClient(config=vllm_config)
+
     def _extract_with_llm(
         self,
         markdown: str,
@@ -538,11 +554,36 @@ class Extractor:
         config: ExtractConfig
     ) -> dict:
         """Extrai em uma única passada."""
+        system_prompt = self._build_system_prompt(schema, config)
+        max_doc_chars = 50000
+
+        # Usar guided_json se habilitado (só vLLM)
+        if config.llm.use_guided_json and config.llm.provider == LLMProvider.VLLM:
+            logger.info("Usando guided_json para extração estruturada")
+            user_prompt = f"""DOCUMENTO:
+{markdown[:max_doc_chars]}
+
+Extraia o documento para JSON seguindo a estrutura do schema. /no_think"""
+
+            vllm_client = self._get_vllm_client(config)
+            try:
+                result = vllm_client.chat_with_schema(
+                    messages=[
+                        {"role": "system", "content": system_prompt},
+                        {"role": "user", "content": user_prompt},
+                    ],
+                    schema=schema,
+                    temperature=config.llm.temperature,
+                    max_tokens=config.llm.max_tokens,
+                )
+                return result
+            finally:
+                vllm_client.close()
+
+        # Fallback: extração tradicional com parsing manual
         json_schema = schema.model_json_schema()
         schema_str = json.dumps(json_schema, indent=2, ensure_ascii=False)
-        system_prompt = self._build_system_prompt(schema, config)
 
-        max_doc_chars = 50000
         user_prompt = f"""DOCUMENTO:
 {markdown[:max_doc_chars]}
 
@@ -586,36 +627,129 @@ Retorne APENAS o JSON extraido, sem explicacoes. /no_think"""
                 chapter_title, chapter_content, config
             )
             if chapter_data:
-                extracted_chapters.append(chapter_data)
+                # Validação pós-extração: remover artigos inventados
+                chapter_data = self._validate_extracted_chapter(
+                    chapter_data, chapter_content
+                )
+                # Só adiciona se ainda tiver artigos após validação
+                if chapter_data.get("articles"):
+                    extracted_chapters.append(chapter_data)
 
         # Combinar resultados
         result = doc_metadata.copy()
         result["chapters"] = extracted_chapters
         return result
 
+    def _validate_extracted_chapter(
+        self,
+        chapter_data: dict,
+        chapter_content: str
+    ) -> dict:
+        """
+        Valida artigos extraídos contra o conteúdo original.
+
+        Remove artigos inventados (que não existem no markdown original).
+        Isso é uma proteção adicional contra alucinação do LLM.
+
+        IMPORTANTE: Distingue entre artigos do próprio documento e
+        referências a artigos de outras leis (ex: "Art. 75 da Lei 14.133").
+        """
+        # Identificar artigos que são DO PRÓPRIO DOCUMENTO (não referências)
+        # Pattern: "Art. N" no início de linha/parágrafo ou após quebra
+        # Exclui: "art. N da Lei X", "art. N do Decreto Y", etc.
+        real_articles = set()
+
+        # Pattern 1: Art. no início de linha ou após marcadores de estrutura
+        # Captura artigos que são definições do documento
+        # Inclui formato Docling: "- Art. N°" (bullet antes do Art.)
+        for match in re.finditer(
+            r'(?:^|\n)\s*[-*]?\s*Art\.?\s*(\d+)[°ºo]?(?:\s|\.|\s*[-–—])',
+            chapter_content,
+            re.IGNORECASE | re.MULTILINE
+        ):
+            real_articles.add(match.group(1))
+
+        # Pattern 2: Art. seguido de conteúdo do artigo (não referência)
+        # Exclui padrões como "art. N da Lei", "art. N do Decreto"
+        for match in re.finditer(
+            r'Art\.?\s*(\d+)[°ºo]?\s+(?![dD][aoeu])',  # Não seguido de "da", "do", "de", "du"
+            chapter_content,
+            re.IGNORECASE
+        ):
+            # Verifica se não é referência a outra lei
+            start = match.start()
+            context_after = chapter_content[match.end():match.end()+30].lower()
+            if not any(ref in context_after for ref in ['lei ', 'decreto ', 'instrução ', 'portaria ']):
+                real_articles.add(match.group(1))
+
+        # Filtrar apenas artigos reais
+        valid_articles = []
+        for article in chapter_data.get("articles", []):
+            art_num_raw = str(article.get("article_number", ""))
+            # Normaliza: extrai apenas o número do article_number
+            # Ex: "Art. 7°" -> "7", "7" -> "7", "Art. Art. 10" -> "10"
+            art_num_match = re.search(r'(\d+)', art_num_raw)
+            art_num = art_num_match.group(1) if art_num_match else art_num_raw
+
+            # Atualiza article_number para formato limpo
+            if art_num_match:
+                article["article_number"] = art_num
+
+            if art_num in real_articles:
+                valid_articles.append(article)
+            else:
+                # Log para debug: artigo inventado detectado e removido
+                logger.warning(
+                    f"Artigo inventado removido: Art. {art_num} "
+                    f"(nao existe no capitulo '{chapter_data.get('title', '')}')"
+                )
+
+        chapter_data["articles"] = valid_articles
+        return chapter_data
+
     def _split_by_chapters(self, markdown: str) -> list[tuple[str, str]]:
-        """Divide markdown por capítulos."""
+        """
+        Divide markdown por capítulos.
+
+        IMPORTANTE: Ignora conteúdo antes do primeiro CAPÍTULO real,
+        pois esse conteúdo é apenas metadados do documento (ementa, data, etc.)
+        e não contém artigos. Incluir esse conteúdo como "capítulo" causaria
+        alucinação do LLM (inventar artigos que não existem).
+        """
         # Pattern para encontrar capítulos
         pattern = r'(CAP[ÍI]TULO\s+[IVXLC]+[^\n]*)'
         parts = re.split(pattern, markdown, flags=re.IGNORECASE)
 
         chapters = []
-        current_title = "DISPOSIÇÕES INICIAIS"
+        current_title = None  # Não criar capítulo fantasma
         current_content = []
+        found_first_chapter = False
 
         for i, part in enumerate(parts):
             if re.match(r'CAP[ÍI]TULO', part, re.IGNORECASE):
-                # Salvar capítulo anterior
-                if current_content:
+                # Salvar capítulo anterior (apenas se já encontramos um capítulo real)
+                if current_content and found_first_chapter:
                     chapters.append((current_title, '\n'.join(current_content)))
                 current_title = part.strip()
                 current_content = []
+                found_first_chapter = True
             else:
-                current_content.append(part)
+                # Só adiciona conteúdo se já encontramos o primeiro capítulo
+                if found_first_chapter:
+                    current_content.append(part)
+                # Conteúdo antes do primeiro capítulo é ignorado (metadados)
 
         # Salvar último capítulo
-        if current_content:
+        if current_content and found_first_chapter:
             chapters.append((current_title, '\n'.join(current_content)))
+
+        # Se não encontrou nenhum capítulo, documento não tem estrutura de capítulos
+        # Nesse caso, retornar documento inteiro como único bloco (sem título fantasma)
+        if not chapters:
+            # Verificar se tem artigos no documento
+            has_articles = bool(re.search(r'Art\.?\s*\d+', markdown, re.IGNORECASE))
+            if has_articles:
+                chapters.append(("DISPOSIÇÕES GERAIS", markdown))
 
         return chapters
 
@@ -646,6 +780,77 @@ Retorne APENAS o JSON. /no_think"""
 
         return self._extract_json_from_response(response.choices[0].message.content)
 
+    def _get_chapter_schema(self) -> dict:
+        """Retorna JSON Schema para extração de capítulo."""
+        return {
+            "type": "object",
+            "properties": {
+                "chapter_number": {
+                    "type": ["string", "null"],
+                    "description": "Número romano do capítulo (I, II, III...)"
+                },
+                "title": {
+                    "type": "string",
+                    "description": "Título do capítulo"
+                },
+                "articles": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "article_number": {
+                                "type": "string",
+                                "description": "Número do artigo (1, 2, 3...)"
+                            },
+                            "title": {
+                                "type": ["string", "null"],
+                                "description": "Título do artigo ou null"
+                            },
+                            "content": {
+                                "type": "string",
+                                "description": "Texto principal do artigo"
+                            },
+                            "items": {
+                                "type": "array",
+                                "items": {
+                                    "type": "object",
+                                    "properties": {
+                                        "item_identifier": {"type": "string"},
+                                        "description": {"type": "string"},
+                                        "sub_items": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "item_identifier": {"type": "string"},
+                                                    "description": {"type": "string"}
+                                                },
+                                                "required": ["item_identifier", "description"]
+                                            }
+                                        }
+                                    },
+                                    "required": ["item_identifier", "description", "sub_items"]
+                                }
+                            },
+                            "paragraphs": {
+                                "type": "array",
+                                "items": {
+                                    "type": "object",
+                                    "properties": {
+                                        "paragraph_identifier": {"type": "string"},
+                                        "content": {"type": "string"}
+                                    },
+                                    "required": ["paragraph_identifier", "content"]
+                                }
+                            }
+                        },
+                        "required": ["article_number", "content", "items", "paragraphs"]
+                    }
+                }
+            },
+            "required": ["title", "articles"]
+        }
+
     def _extract_chapter(
         self,
         chapter_title: str,
@@ -653,6 +858,59 @@ Retorne APENAS o JSON. /no_think"""
         config: ExtractConfig
     ) -> dict:
         """Extrai artigos de um capítulo."""
+        # Validação pré-extração: verificar se o texto realmente tem artigos
+        articles_in_content = re.findall(r'Art\.?\s*(\d+)', chapter_content, re.IGNORECASE)
+        if not articles_in_content:
+            # Não há artigos neste capítulo, retornar vazio
+            return {
+                "chapter_number": None,
+                "title": chapter_title,
+                "articles": []
+            }
+
+        # Lista de artigos esperados para validação
+        expected_articles = sorted(set(int(a) for a in articles_in_content))
+        expected_str = ", ".join(str(a) for a in expected_articles)
+
+        system_prompt = """Voce e um extrator de documentos legais brasileiros.
+REGRAS CRITICAS:
+1. Extraia APENAS os artigos que EXISTEM no texto
+2. NAO INVENTE artigos que nao estao no texto
+3. Incisos sao I, II, III... -> items
+4. Paragrafos sao § 1o, § 2o, Paragrafo unico -> paragraphs
+5. Alineas sao a), b), c) -> sub_items
+PROIBIDO: Criar artigos inventados ou com conteudo fabricado."""
+
+        user_prompt = f"""Extraia os artigos deste capitulo:
+
+CAPITULO: {chapter_title}
+ARTIGOS ESPERADOS: Art. {expected_str}
+
+CONTEUDO:
+{chapter_content[:8000]}
+
+/no_think"""
+
+        # Usar guided_json se habilitado (só vLLM)
+        if config.llm.use_guided_json and config.llm.provider == LLMProvider.VLLM:
+            vllm_client = self._get_vllm_client(config)
+            try:
+                result = vllm_client.chat_with_schema(
+                    messages=[
+                        {"role": "system", "content": system_prompt},
+                        {"role": "user", "content": user_prompt},
+                    ],
+                    schema=self._get_chapter_schema(),
+                    temperature=0.0,
+                    max_tokens=config.llm.max_tokens,
+                )
+                return result
+            except Exception as e:
+                logger.warning(f"guided_json falhou para capítulo, usando fallback: {e}")
+            finally:
+                vllm_client.close()
+
+        # Fallback: extração tradicional
         prompt = f"""Extraia TODOS os artigos deste capitulo de documento legal:
 
 CAPITULO: {chapter_title}
@@ -672,12 +930,15 @@ Retorne JSON com:
   }}
 ]}}
 
-IMPORTANTE:
-- Extraia ABSOLUTAMENTE TODOS os artigos, do primeiro ao ultimo
-- NAO pule nenhum artigo
-- Incisos sao I, II, III... -> items
-- Paragrafos sao § 1o, § 2o, Paragrafo unico -> paragraphs
-- Alineas sao a), b), c) -> sub_items
+REGRAS CRITICAS:
+1. Extraia APENAS os artigos que EXISTEM no texto: Art. {expected_str}
+2. NAO INVENTE artigos que nao estao no texto
+3. Se nao encontrar um artigo no texto, NAO o inclua no JSON
+4. Incisos sao I, II, III... -> items
+5. Paragrafos sao § 1o, § 2o, Paragrafo unico -> paragraphs
+6. Alineas sao a), b), c) -> sub_items
+
+PROIBIDO: Criar artigos inventados ou com conteudo fabricado.
 
 Retorne APENAS o JSON. /no_think"""
 

@@ -51,7 +51,7 @@ def create_vllm_client() -> VLLMClient:
     """Cria cliente vLLM para enriquecimento."""
     config = LLMConfig(
         base_url="http://localhost:8000/v1",
-        model="Qwen/Qwen3-4B-AWQ",  # Modelo para enriquecimento
+        model="Qwen/Qwen3-8B-AWQ",  # Modelo unico para extracao + enriquecimento
         temperature=0.0,
         max_tokens=1024,
     )

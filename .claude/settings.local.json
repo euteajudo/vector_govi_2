@@ -26,7 +26,11 @@
       "Bash(docker rm:*)",
       "Bash(timeout:*)",
       "Bash(D:/2025/pipeline/extracao/.venv/Scripts/python.exe:*)",
-      "Bash(D:/2025/pipeline/extracao/.venv/Scripts/pip.exe install:*)"
+      "Bash(D:/2025/pipeline/extracao/.venv/Scripts/pip.exe install:*)",
+      "Bash(D:2025pipelineextracao.venvScriptspython.exe teststest_span_parser.py)",
+      "WebFetch(domain:docling-project.github.io)",
+      "Bash(D:2025pipelineextracao.venvScriptspython.exe teststest_page_spans.py)",
+      "Bash(D:2025pipelineextracao.venvScriptspython.exe scripts/run_pipeline_v3.py)"
     ]
   }
 }

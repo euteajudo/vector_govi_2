@@ -197,6 +197,10 @@ class VLLMClient:
         """
         Envia mensagens e retorna resposta parseada como JSON.
 
+        NOTA: Este metodo faz parsing POS-RESPOSTA (pode falhar).
+        Para extracao estruturada, use chat_with_schema() que forca
+        o modelo a gerar JSON valido via guided_json.
+
         Args:
             messages: Lista de mensagens
             **kwargs: Parametros para chat()
@@ -229,6 +233,109 @@ class VLLMClient:
             if match:
                 return json.loads(match.group())
             raise ValueError(f"Nao foi possivel parsear JSON: {response[:200]}") from e
+
+    def chat_with_schema(
+        self,
+        messages: list[dict],
+        schema: type,
+        temperature: Optional[float] = None,
+        max_tokens: Optional[int] = None,
+        model: Optional[str] = None,
+    ) -> dict:
+        """
+        Envia mensagens com response_format json_schema para forcar output estruturado.
+
+        IMPORTANTE: Este metodo usa o recurso json_schema do vLLM que
+        forca o modelo a gerar APENAS tokens validos para o schema.
+        Muito mais confiavel que chat_json() para extracao estruturada.
+
+        Uso:
+            from pydantic import BaseModel
+
+            class Article(BaseModel):
+                article_number: str
+                content: str
+
+            result = client.chat_with_schema(
+                messages=[{"role": "user", "content": "Extraia..."}],
+                schema=Article,
+            )
+
+        Args:
+            messages: Lista de mensagens
+            schema: Classe Pydantic ou dict com JSON Schema
+            temperature: Temperatura (default: 0 para extracao)
+            max_tokens: Max tokens (default: config)
+            model: Modelo (default: config)
+
+        Returns:
+            Dict validado contra o schema
+        """
+        # Extrai JSON Schema do Pydantic ou usa dict direto
+        if hasattr(schema, "model_json_schema"):
+            json_schema = schema.model_json_schema()
+            schema_name = schema.__name__
+        elif isinstance(schema, dict):
+            json_schema = schema
+            schema_name = "extraction_schema"
+        else:
+            raise ValueError(f"Schema deve ser Pydantic BaseModel ou dict, recebido: {type(schema)}")
+
+        payload = {
+            "model": model or self.config.model,
+            "messages": messages,
+            "temperature": temperature if temperature is not None else 0.0,  # 0 para extracao
+            "max_tokens": max_tokens or self.config.max_tokens,
+            "response_format": {
+                "type": "json_schema",
+                "json_schema": {
+                    "name": schema_name,
+                    "schema": json_schema,
+                },
+            },
+        }
+
+        for attempt in range(self.config.max_retries):
+            try:
+                start_time = time.time()
+
+                response = self._client.post("/chat/completions", json=payload)
+                response.raise_for_status()
+
+                elapsed = time.time() - start_time
+                data = response.json()
+
+                # Extrai texto da resposta
+                content = data["choices"][0]["message"]["content"]
+
+                # Log metricas
+                usage = data.get("usage", {})
+                logger.debug(
+                    f"LLM json_schema response: {elapsed:.2f}s, "
+                    f"prompt_tokens={usage.get('prompt_tokens', '?')}, "
+                    f"completion_tokens={usage.get('completion_tokens', '?')}"
+                )
+
+                # Com json_schema, o output JA e JSON valido
+                return json.loads(content)
+
+            except httpx.HTTPStatusError as e:
+                logger.warning(f"HTTP error (attempt {attempt+1}): {e}")
+                if attempt < self.config.max_retries - 1:
+                    time.sleep(self.config.retry_delay * (attempt + 1))
+                else:
+                    raise
+
+            except json.JSONDecodeError as e:
+                # Isso nao deveria acontecer com json_schema
+                logger.error(f"JSON invalido mesmo com json_schema: {e}")
+                raise
+
+            except Exception as e:
+                logger.error(f"Erro inesperado: {e}")
+                raise
+
+        raise RuntimeError("Falha apos todas as tentativas")
 
     def list_models(self) -> list[str]:
         """Lista modelos disponiveis no servidor."""

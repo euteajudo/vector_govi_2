@@ -299,7 +299,11 @@ class HybridSearcher:
         """
         Reordena resultados com cross-encoder (Stage 2).
 
-        Usa enriched_text para melhor contexto semantico.
+        IMPORTANTE: Usa texto ORIGINAL para reranking, não enriched_text.
+        O enriched_text tem prefixo [CONTEXTO: ...] que dilui a relevância
+        para o cross-encoder. Testes mostraram:
+        - Texto original: score 0.55
+        - Enriched_text: score 0.27
 
         Args:
             query: Texto da consulta
@@ -312,10 +316,11 @@ class HybridSearcher:
             return hits
 
         # Prepara documentos para reranking
+        # USA TEXTO ORIGINAL - melhor para cross-encoder
         documents = [
             {
                 "hit": hit,
-                "enriched_text": hit.enriched_text or hit.text,
+                "text": hit.text,  # Texto original, sem prefixo [CONTEXTO]
             }
             for hit in hits
         ]
@@ -324,7 +329,7 @@ class HybridSearcher:
         reranked = self.reranker.rerank(
             query=query,
             documents=documents,
-            text_key="enriched_text",
+            text_key="text",  # Usa texto original
             return_scores=True,
         )
 
