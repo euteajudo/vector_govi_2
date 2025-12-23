@@ -41,6 +41,7 @@ Busca rapida (helper):
 from .config import SearchConfig, SearchMode, RerankMode
 from .models import SearchHit, SearchResult, SearchFilter
 from .hybrid_searcher import HybridSearcher, search
+from .hyde_expander import HyDEExpander, HyDEResult
 from .contextual_retriever import (
     ContextualRetriever,
     RetrievalStrategy,
@@ -55,6 +56,9 @@ __all__ = [
     # Principal
     "HybridSearcher",
     "search",
+    # HyDE (Query Expansion)
+    "HyDEExpander",
+    "HyDEResult",
     # Contextual Retriever (parent-child + MMR)
     "ContextualRetriever",
     "RetrievalStrategy",

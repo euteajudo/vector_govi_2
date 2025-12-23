@@ -682,10 +682,16 @@ Retorne JSON com:
         parsed_doc: ParsedDocument
     ) -> list[str]:
         """
-        Valida consistência entre sufixo de inciso e parent_id.
+        Valida consistência de parent_id dos incisos.
 
-        Ex: INC-005-I_2 deve ter parent_id=PAR-005-2
-        Se sufixo é _2, parent deve ser o 2º parágrafo do artigo.
+        NOTA: O sufixo _N em INC-XXX-I_N é apenas um DISAMBIGUADOR para quando
+        há múltiplos incisos com o mesmo número romano no artigo (ex: inciso I
+        aparece tanto no caput quanto em §1 ou §2). O sufixo NÃO indica qual
+        parágrafo é o parent - isso é determinado pela posição no texto.
+
+        Esta validação apenas verifica se:
+        1. O parent existe no documento
+        2. O parent pertence ao mesmo artigo
 
         Returns:
             Lista de erros encontrados
@@ -697,31 +703,37 @@ Retorne JSON com:
             if not span:
                 continue
 
-            # Verifica se tem sufixo (ex: INC-005-I_2)
-            if "_" not in inc_id:
-                continue  # Sem sufixo, nada a validar
-
-            # Extrai sufixo (ex: "2" de INC-005-I_2)
-            parts = inc_id.rsplit("_", 1)
-            if len(parts) != 2:
+            # Extrai número do artigo do inciso (ex: "005" de INC-005-I ou INC-005-I_2)
+            match = re.match(r'^INC-(\d+)-', inc_id)
+            if not match:
                 continue
 
-            suffix = parts[1]
+            art_num = match.group(1)
 
-            # Se sufixo numérico, parent deve ser parágrafo correspondente
-            if suffix.isdigit():
-                # Extrai número do artigo (ex: "005" de INC-005-I_2)
-                match = re.match(r'^INC-(\d+)-', inc_id)
-                if not match:
-                    continue
+            # Parent deve existir
+            if not span.parent_id:
+                errors.append(f"{inc_id}: parent_id vazio")
+                continue
 
-                art_num = match.group(1)
-                expected_parent = f"PAR-{art_num}-{suffix}"
+            parent = parsed_doc.get_span(span.parent_id)
+            if not parent:
+                errors.append(f"{inc_id}: parent '{span.parent_id}' não encontrado")
+                continue
 
-                if span.parent_id != expected_parent:
+            # Parent deve ser do mesmo artigo (ART-XXX ou PAR-XXX-N)
+            if span.parent_id.startswith("ART-"):
+                parent_art = span.parent_id.replace("ART-", "")
+                if parent_art != art_num:
                     errors.append(
-                        f"{inc_id}: esperado parent={expected_parent}, "
-                        f"encontrado={span.parent_id}"
+                        f"{inc_id}: artigo mismatch (inciso de art {art_num}, "
+                        f"parent de art {parent_art})"
+                    )
+            elif span.parent_id.startswith("PAR-"):
+                parent_match = re.match(r'^PAR-(\d+)-', span.parent_id)
+                if parent_match and parent_match.group(1) != art_num:
+                    errors.append(
+                        f"{inc_id}: artigo mismatch (inciso de art {art_num}, "
+                        f"parent de art {parent_match.group(1)})"
                     )
 
         return errors

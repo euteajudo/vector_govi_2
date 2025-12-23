@@ -44,8 +44,15 @@ class SearchHit:
     enriched_text: str = ""
     article_number: str = ""
 
+    # Campos v3 (parent-child)
+    span_id: str = ""
+    parent_chunk_id: str = ""
+    device_type: str = ""  # article, paragraph, inciso, alinea
+    document_id: str = ""
+
     # Scores
     score: float = 0.0
+    milvus_score: float = 0.0  # Score original do Milvus
     rerank_score: Optional[float] = None
 
     # Enriquecimento
@@ -55,10 +62,11 @@ class SearchHit:
     synthetic_questions: str = ""
 
     # Hierarquia
-    document_type: str = ""
+    document_type: str = ""  # LEI, DECRETO, IN
     document_number: str = ""
     chapter_number: str = ""
     chapter_title: str = ""
+    tipo_documento: str = ""  # Alias para document_type (compatibilidade Milvus)
 
     # Extras
     metadata: dict[str, Any] = field(default_factory=dict)
@@ -80,17 +88,27 @@ class SearchHit:
             "text": self.text,
             "enriched_text": self.enriched_text,
             "article_number": self.article_number,
+            # Campos v3
+            "span_id": self.span_id,
+            "parent_chunk_id": self.parent_chunk_id,
+            "device_type": self.device_type,
+            "document_id": self.document_id,
+            # Scores
             "score": self.score,
+            "milvus_score": self.milvus_score,
             "rerank_score": self.rerank_score,
             "final_score": self.final_score,
+            # Enriquecimento
             "context_header": self.context_header,
             "thesis_text": self.thesis_text,
             "thesis_type": self.thesis_type,
             "synthetic_questions": self.synthetic_questions,
+            # Hierarquia
             "document_type": self.document_type,
             "document_number": self.document_number,
             "chapter_number": self.chapter_number,
             "chapter_title": self.chapter_title,
+            "tipo_documento": self.tipo_documento,
             "metadata": self.metadata,
         }
 
@@ -113,20 +131,33 @@ class SearchHit:
                 return entity.get(name, default)
             return getattr(entity, name, default)
 
+        milvus_score = hit.distance if hasattr(hit, "distance") else 0.0
+        tipo_doc = get_field("tipo_documento", "")
+
         return cls(
             chunk_id=get_field("chunk_id", ""),
             text=get_field("text", ""),
             enriched_text=get_field("enriched_text", ""),
             article_number=get_field("article_number", ""),
-            score=hit.distance if hasattr(hit, "distance") else 0.0,
+            # Campos v3
+            span_id=get_field("span_id", ""),
+            parent_chunk_id=get_field("parent_chunk_id", ""),
+            device_type=get_field("device_type", ""),
+            document_id=get_field("document_id", ""),
+            # Scores
+            score=milvus_score,
+            milvus_score=milvus_score,
+            # Enriquecimento
             context_header=get_field("context_header", ""),
             thesis_text=get_field("thesis_text", ""),
             thesis_type=get_field("thesis_type", ""),
             synthetic_questions=get_field("synthetic_questions", ""),
-            document_type=get_field("tipo_documento", ""),
-            document_number=get_field("numero_documento", ""),
+            # Hierarquia
+            document_type=tipo_doc,
+            document_number=get_field("numero", ""),
             chapter_number=get_field("chapter_number", ""),
             chapter_title=get_field("chapter_title", ""),
+            tipo_documento=tipo_doc,
         )
 
 

@@ -32,6 +32,8 @@ from llm.vllm_client import VLLMClient, LLMConfig
 from embeddings.bge_m3 import BGEM3Embedder, EmbeddingConfig
 from milvus.schema_v3 import COLLECTION_NAME_V3
 from dashboard import MetricsCollector, generate_dashboard_report
+from enrichment import ChunkEnricher
+from enrichment.chunk_enricher import DocumentMetadata
 
 logging.basicConfig(
     level=logging.INFO,
@@ -387,9 +389,52 @@ def run_pipeline_v3(
     )
     collector.end_phase("materialization", items_processed=len(all_chunks))
 
+
+    # 4.5. Enriquecimento com LLM (Contextual Retrieval)
+    if use_llm and all_chunks:
+        print("\n[4.5/7] Enriquecendo chunks com contexto...")
+        collector.start_phase("enrichment")
+        enrich_start = time.time()
+
+        try:
+            # Cria cliente LLM para enriquecimento
+            enrich_llm = create_vllm_client()
+
+            doc_meta = DocumentMetadata(
+                document_id=document_id,
+                document_type=tipo_documento,
+                number=numero,
+                year=ano,
+                issuing_body="PRESIDENCIA DA REPUBLICA" if tipo_documento == "LEI" else "SEGES/ME",
+            )
+
+            enricher = ChunkEnricher(llm_client=enrich_llm)
+            all_chunks = enricher.apply_to_chunks(
+                chunks=all_chunks,
+                doc_meta=doc_meta,
+                batch_size=5,
+            )
+
+            enrich_time = time.time() - enrich_start
+            stats = enricher.get_stats()
+            print(f"      Chunks enriquecidos: {stats['chunks_processed']}")
+            print(f"      Erros: {stats['errors']}")
+            print(f"      Tempo: {enrich_time:.2f}s")
+
+            enricher.close()
+            collector.end_phase("enrichment", items_processed=len(all_chunks))
+
+        except Exception as e:
+            print(f"      ERRO no enriquecimento: {e}")
+            import traceback
+            traceback.print_exc()
+            collector.end_phase("enrichment", errors=1)
+    else:
+        print("\n[4.5/7] Pulando enriquecimento (sem LLM)...")
+
     # 5. Gera embeddings
     if use_embeddings:
-        print("\n[5/6] Gerando embeddings BGE-M3...")
+        print("\n[5/7] Gerando embeddings BGE-M3...")
         collector.start_phase("embedding")
         embed_start = time.time()
 
@@ -403,14 +448,20 @@ def run_pipeline_v3(
 
             # Processa em batch usando encode_hybrid (dense + sparse)
             for i, chunk in enumerate(all_chunks):
-                # Usa texto para embedding (idealmente seria enriched_text)
-                text = chunk.text
+                # Usa enriched_text para embedding (com contexto e perguntas)
+                text = chunk.enriched_text if chunk.enriched_text else chunk.text
 
-                # Gera embedding hibrido (dense + sparse)
+                # Gera embedding hibrido (dense + sparse) para texto enriquecido
                 result = embedder.encode_hybrid([text])
-
                 chunk.dense_vector = result['dense'][0]
                 chunk.sparse_vector = result['sparse'][0]
+
+                # Gera thesis_vector separado (se tiver thesis_text)
+                if chunk.thesis_text:
+                    thesis_result = embedder.encode_hybrid([chunk.thesis_text])
+                    chunk.thesis_vector = thesis_result['dense'][0]
+                else:
+                    chunk.thesis_vector = chunk.dense_vector
 
                 if (i + 1) % 10 == 0:
                     print(f"      Processados: {i + 1}/{len(all_chunks)}")
@@ -425,11 +476,11 @@ def run_pipeline_v3(
             print(f"      ERRO gerando embeddings: {e}")
             collector.end_phase("embedding", errors=1)
     else:
-        print("\n[5/6] Pulando embeddings...")
+        print("\n[5/7] Pulando embeddings...")
 
     # 6. Insere no Milvus
     if use_milvus and all_chunks:
-        print("\n[6/6] Inserindo no Milvus leis_v3...")
+        print("\n[6/7] Inserindo no Milvus leis_v3...")
         collector.start_phase("indexing")
         index_start = time.time()
 
@@ -443,7 +494,7 @@ def run_pipeline_v3(
             collector.end_phase("indexing", errors=1)
             collector.set_error(str(e))
     else:
-        print("\n[6/6] Pulando inserção no Milvus")
+        print("\n[6/7] Pulando inserção no Milvus")
 
     # Gera relatório
     total_time = time.time() - total_start

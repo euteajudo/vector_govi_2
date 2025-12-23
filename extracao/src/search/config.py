@@ -73,7 +73,7 @@ class SearchConfig:
     # Conexao
     milvus_host: str = "localhost"
     milvus_port: int = 19530
-    collection_name: str = "leis_v2"
+    collection_name: str = "leis_v3"
 
     # Modos
     search_mode: SearchMode = SearchMode.HYBRID_3WAY
@@ -98,23 +98,36 @@ class SearchConfig:
     use_fp16: bool = True
     batch_size: int = 32
 
+    # HyDE (Hypothetical Document Embeddings) - Query Expansion
+    use_hyde: bool = False  # Toggle para habilitar/desabilitar HyDE
+    hyde_n_hypothetical: int = 3  # Numero de documentos hipoteticos a gerar
+    hyde_query_weight: float = 0.4  # Peso do embedding da query original
+    hyde_doc_weight: float = 0.6  # Peso dos embeddings dos docs hipoteticos
+
     def __post_init__(self):
         """Valida configuracao."""
         # Define campos padrao se nao especificados
         if self.output_fields is None:
             self.output_fields = [
+                # Identificacao
                 "chunk_id",
+                "span_id",
+                "parent_chunk_id",
+                "device_type",
+                "document_id",
+                # Conteudo
                 "text",
                 "enriched_text",
                 "article_number",
+                # Enriquecimento
                 "context_header",
                 "thesis_text",
                 "thesis_type",
                 "synthetic_questions",
+                # Metadados
                 "tipo_documento",
-                "numero_documento",
-                "chapter_number",
-                "chapter_title",
+                "numero",
+                "ano",
             ]
 
         # Valida pesos
@@ -182,5 +195,24 @@ class SearchConfig:
             weight_sparse=0.3,  # Termos especificos
             weight_thesis=0.2,  # Essencia do artigo
             stage1_limit=20,
+            top_k=5,
+        )
+
+    @classmethod
+    def with_hyde(cls) -> "SearchConfig":
+        """
+        Configuracao com HyDE habilitado para query expansion.
+
+        Gera documentos hipoteticos e combina embeddings para
+        melhorar recall em queries ambiguas.
+        """
+        return cls(
+            search_mode=SearchMode.HYBRID_3WAY,
+            rerank_mode=RerankMode.CROSS_ENCODER,
+            use_hyde=True,
+            hyde_n_hypothetical=3,
+            hyde_query_weight=0.4,
+            hyde_doc_weight=0.6,
+            stage1_limit=30,  # Mais candidatos com HyDE
             top_k=5,
         )

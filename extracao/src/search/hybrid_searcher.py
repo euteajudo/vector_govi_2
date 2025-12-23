@@ -58,6 +58,7 @@ class HybridSearcher:
         self.config = config or SearchConfig.default()
         self._embedder = embedder
         self._reranker = reranker
+        self._hyde_expander = None
         self._collection: Optional[Collection] = None
         self._connected = False
 
@@ -88,6 +89,24 @@ class HybridSearcher:
                 RerankerConfig(use_fp16=self.config.use_fp16)
             )
         return self._reranker
+
+    @property
+    def hyde_expander(self):
+        """Carrega HyDE expander sob demanda (apenas se use_hyde=True)."""
+        if self._hyde_expander is None and self.config.use_hyde:
+            from .hyde_expander import HyDEExpander
+            from llm.vllm_client import VLLMClient, LLMConfig
+
+            logger.info("Carregando HyDE expander...")
+            llm = VLLMClient(LLMConfig.for_enrichment())
+            self._hyde_expander = HyDEExpander(
+                llm_client=llm,
+                embedder=self.embedder,
+                n_hypothetical=self.config.hyde_n_hypothetical,
+                query_weight=self.config.hyde_query_weight,
+                doc_weight=self.config.hyde_doc_weight,
+            )
+        return self._hyde_expander
 
     @property
     def collection(self) -> Collection:
@@ -206,8 +225,16 @@ class HybridSearcher:
         Returns:
             Lista de SearchHit ordenados por score combinado
         """
-        # Gera embedding da query
-        query_embedding = self.embedder.encode_hybrid_single(query)
+        # Gera embedding da query (com HyDE se habilitado)
+        if self.config.use_hyde and self.hyde_expander:
+            logger.debug("Usando HyDE para query expansion")
+            hyde_result = self.hyde_expander.expand(query)
+            query_embedding = {
+                "dense": hyde_result.combined_dense,
+                "sparse": hyde_result.combined_sparse,
+            }
+        else:
+            query_embedding = self.embedder.encode_hybrid_single(query)
 
         # Prepara expressao de filtro
         filter_expr = filters.to_milvus_expr() if filters else ""
