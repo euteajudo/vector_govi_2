@@ -1,0 +1,228 @@
+{
+  "document_id": "INSTRUCAO-NORMATIVA-SEGES-58-2022",
+  "summary": {
+    "document_id": "INSTRUCAO-NORMATIVA-SEGES-58-2022",
+    "total_chunks": 19,
+    "total_tokens": 3299,
+    "chunks_by_level": {
+      "ARTICLE": 19
+    },
+    "chunks_by_type": {
+      "disposicao": 19
+    },
+    "processing_time": "0.31s",
+    "errors": 0,
+    "warnings": 0
+  },
+  "chunks": [
+    {
+      "chunk_id": "INSTRUCAO-NORMATIVA-SEGES-58-2022#CAP-I#ART-1",
+      "parent_id": "INSTRUCAO-NORMATIVA-SEGES-58-2022#CAP-I",
+      "chunk_level": "ARTICLE",
+      "article_number": "1",
+      "chapter_number": "I",
+      "item_count": 0,
+      "paragraph_count": 0,
+      "token_count": 78,
+      "text": "Art. 1º Esta Instrução Normativa dispõe sobre a elaboração dos Estudos Técnicos Preliminares ETP, para a aquisição de bens e a contratação de serviços e obras, no âmbito da administração pública federal direta, autárquica e fundacional, e sobre o Sistema ETP digital."
+    },
+    {
+      "chunk_id": "INSTRUCAO-NORMATIVA-SEGES-58-2022#CAP-I#ART-2",
+      "parent_id": "INSTRUCAO-NORMATIVA-SEGES-58-2022#CAP-I",
+      "chunk_level": "ARTICLE",
+      "article_number": "2",
+      "chapter_number": "I",
+      "item_count": 0,
+      "paragraph_count": 0,
+      "token_count": 75,
+      "text": "Art. 2º Os órgãos e entidades da administração pública estadual, distrital ou municipal, direta ou indireta, quando executarem recursos da União decorrentes de transferências voluntárias, deverão observar as regras e os procedimentos de que dispõe esta Instrução Normativa."
+    },
+    {
+      "chunk_id": "INSTRUCAO-NORMATIVA-SEGES-58-2022#CAP-I#ART-3",
+      "parent_id": "INSTRUCAO-NORMATIVA-SEGES-58-2022#CAP-I",
+      "chunk_level": "ARTICLE",
+      "article_number": "3",
+      "chapter_number": "I",
+      "item_count": 7,
+      "paragraph_count": 2,
+      "token_count": 574,
+      "text": "Art. 3º Para fins do disposto nesta Instrução Normativa, considera-se:\nI - Estudo Técnico Preliminar - ETP: documento constitutivo da primeira etapa do planejamento de uma contratação que caracteriza o interesse público envolvido e a sua melhor solução e dá base ao anteprojeto, ao termo de referência ou ao projeto básico a serem elaborados caso se conclua pela viabilidade da contratação;\nII - Sistema ETP Digital: ferramenta informatizada integrante da plataforma do Sistema Integrado de Administração de Serviços Gerais - Siasg, disponibilizada pela Secretaria de Gestão da Secretaria Especial de Desburocratização, Gestão e Governo Digital do Ministério da Economia, para elaboração dos ETP pelos órgãos e entidades de que trata o art. 1º;\nIII - contratações correlatas: aquelas cujos objetos sejam similares ou correspondentes entre si;\nIV - contratações interdependentes: aquelas que, por guardarem relação direta na execução do objeto, devem ser contratadas juntamente para a plena satisfação da necessidade da Administração;\nV - requisitante: agente ou unidade responsável por identificar a necessidade de contratação de bens, serviços e obras e requerê-la;\nVI - área técnica: agente ou unidade com conhecimento técnico-operacional sobre o objeto demandado, responsável por analisar o documento de formalização de demanda, e promover a agregação de valor e a compilação de necessidades de mesma natureza;\nVII - equipe de planejamento da contratação: conjunto de agentes que reúnem as competências necessárias à completa execução das etapas de planejamento da contratação, o que inclui conhecimentos sobre aspectos técnicos-operacionais e de uso do objeto, licitações e contratos, dentre outros.\n§ 1º Os papéis de requisitante e de área técnica poderão ser exercidos pelo mesmo agente público ou unidade, desde que, no exercício dessas atribuições, detenha conhecimento técnico-operacional sobre o objeto demandado, observado o disposto no inciso VI do caput.\n§ 2º A definição dos requisitantes, das áreas técnicas e da equipe de planejamento da contratação não ensejará, obrigatoriamente, a criação de novas estruturas nas unidades organizacionais dos órgãos e das entidades."
+    },
+    {
+      "chunk_id": "INSTRUCAO-NORMATIVA-SEGES-58-2022#CAP-I#ART-4",
+      "parent_id": "INSTRUCAO-NORMATIVA-SEGES-58-2022#CAP-I",
+      "chunk_level": "ARTICLE",
+      "article_number": "4",
+      "chapter_number": "I",
+      "item_count": 0,
+      "paragraph_count": 2,
+      "token_count": 222,
+      "text": "Art. 4º Os ETP deverão ser elaborados no Sistema ETP Digital, observados os procedimentos estabelecidos no manual técnico operacional que será publicado pela Secretaria de Gestão da Secretaria Especial de Desburocratização, Gestão e Governo Digital do Ministério da Economia, disponível no endereço eletrônico www.gov.br/compras, para acesso ao sistema e operacionalização.\n§ 1º Em caso de não utilização do Sistema ETP Digital pelos órgãos e entidades de que trata o art. 2º, a elaboração do ETP deverá ocorrer em ferramenta informatizada própria.\n§ 2º O Sistema ETP Digital disporá de indicadores de performance, salientando-se os estudos cujas contratações culminaram nas maiores avaliações do desempenho do contratado, nos termos do § 3º do art. 88 da Lei nº 14.133, de 2021."
+    },
+    {
+      "chunk_id": "INSTRUCAO-NORMATIVA-SEGES-58-2022#CAP-I#ART-5",
+      "parent_id": "INSTRUCAO-NORMATIVA-SEGES-58-2022#CAP-I",
+      "chunk_level": "ARTICLE",
+      "article_number": "5",
+      "chapter_number": "I",
+      "item_count": 0,
+      "paragraph_count": 0,
+      "token_count": 108,
+      "text": "Art. 5º A Secretaria de Gestão da Secretaria Especial de Desburocratização, Gestão e Governo Digital do Ministério da Economia poderá ceder o uso do Sistema ETP digital, por meio de termo de acesso, a órgão ou entidade dos Poderes da União, dos Estados, do Distrito Federal e dos Municípios, conforme disposto na Portaria nº 355, de 9 de agosto de 2019."
+    },
+    {
+      "chunk_id": "INSTRUCAO-NORMATIVA-SEGES-58-2022#CAP-II#ART-6",
+      "parent_id": "INSTRUCAO-NORMATIVA-SEGES-58-2022#CAP-II",
+      "chunk_level": "ARTICLE",
+      "article_number": "6",
+      "chapter_number": "II",
+      "item_count": 0,
+      "paragraph_count": 0,
+      "token_count": 53,
+      "text": "Art. 6º O ETP deverá evidenciar o problema a ser resolvido e a melhor solução, de modo a permitir a avaliação da viabilidade técnica, socioeconômica e ambiental da contratação."
+    },
+    {
+      "chunk_id": "INSTRUCAO-NORMATIVA-SEGES-58-2022#CAP-II#ART-7",
+      "parent_id": "INSTRUCAO-NORMATIVA-SEGES-58-2022#CAP-II",
+      "chunk_level": "ARTICLE",
+      "article_number": "7",
+      "chapter_number": "II",
+      "item_count": 0,
+      "paragraph_count": 0,
+      "token_count": 53,
+      "text": "Art. 7º O ETP deverá estar alinhado com o Plano de Contratações Anual e com o Plano Diretor de Logística Sustentável, além de outros instrumentos de planejamento da Administração."
+    },
+    {
+      "chunk_id": "INSTRUCAO-NORMATIVA-SEGES-58-2022#CAP-II#ART-8",
+      "parent_id": "INSTRUCAO-NORMATIVA-SEGES-58-2022#CAP-II",
+      "chunk_level": "ARTICLE",
+      "article_number": "8",
+      "chapter_number": "II",
+      "item_count": 0,
+      "paragraph_count": 0,
+      "token_count": 56,
+      "text": "Art. 8º O ETP será elaborado conjuntamente por servidores da área técnica e requisitante ou, quando houver, pela equipe de planejamento da contratação, observado o § 1º do art. 3º."
+    },
+    {
+      "chunk_id": "INSTRUCAO-NORMATIVA-SEGES-58-2022#CAP-II#ART-9",
+      "parent_id": "INSTRUCAO-NORMATIVA-SEGES-58-2022#CAP-II",
+      "chunk_level": "ARTICLE",
+      "article_number": "9",
+      "chapter_number": "II",
+      "item_count": 13,
+      "paragraph_count": 3,
+      "token_count": 816,
+      "text": "Art. 9º Com base no Plano de Contratações Anual, deverão ser registrados no Sistema ETP Digital os seguintes elementos:\nI - descrição da necessidade da contratação, considerado o problema a ser resolvido sob a perspectiva do interesse público;\nII - descrição dos requisitos da contratação necessários e suficientes à escolha da solução, prevendo critérios e práticas de sustentabilidade, observadas as leis ou regulamentações específicas, bem como padrões mínimos de qualidade e desempenho;\nIII - levantamento de mercado, que consiste na análise das alternativas possíveis, e justificativa técnica e econômica da escolha do tipo de solução a contratar, podendo, entre outras opções:\nIV - descrição da solução como um todo, inclusive das exigências relacionadas à manutenção e à assistência técnica, quando for o caso;\nV - estimativa das quantidades a serem contratadas, acompanhada das memórias de cálculo e dos documentos que lhe dão suporte, considerando a interdependência com outras contratações, de modo a possibilitar economia de escala;\nVI - estimativa do valor da contratação, acompanhada dos preços unitários referenciais, das memórias de cálculo e dos documentos que lhe dão suporte, que poderão constar de anexo classificado, se a Administração optar por preservar o seu sigilo até a conclusão da licitação;\nVII - justificativas para o parcelamento ou não da solução;\nVIII - contratações correlatas e/ou interdependentes;\nIX - demonstrativo da previsão da contratação no Plano de Contratações Anual, de modo a indicar o seu alinhamento com o instrumentos de planejamento do órgão ou entidade;\nX - demonstrativo dos resultados pretendidos, em termos de economicidade e de melhor aproveitamento dos recursos humanos, materiais e financeiros disponíveis;\nXI - providências a serem adotadas pela Administração previamente à celebração do contrato, tais como adaptações no ambiente do órgão ou da entidade, necessidade de obtenção de licenças, outorgas ou autorizações, capacitação de servidores ou de empregados para fiscalização e gestão contratual;\nXII - descrição de possíveis impactos ambientais e respectivas medidas mitigadoras, incluídos requisitos de baixo consumo de energia e de outros recursos, bem como logística reversa para desfazimento e reciclagem de bens e refugos, quando aplicável; e\nXIII - posicionamento conclusivo sobre a adequação da contratação para o atendimento da necessidade a que se destina.\n§ 1º O ETP deverá conter ao menos os elementos previstos nos incisos I, V, VI, VII e XIII do caput deste artigo e, quando não contemplar os demais elementos, apresentar as devidas justificativas.\n§ 2º Caso, após o levantamento do mercado de que trata o inciso III, a quantidade de fornecedores for considerada restrita, deve-se verificar se os requisitos que limitam a participação são realmente indispensáveis, flexibilizando-os sempre que possível.\n§ 3º Em todos os casos, o estudo técnico preliminar deve privilegiar a consecução dos objetivos de uma contratação, nos termos no art. 11 da Lei nº 14.133, de 2021, em detrimento de modelagem de contratação centrada em exigências meramente formais."
+    },
+    {
+      "chunk_id": "INSTRUCAO-NORMATIVA-SEGES-58-2022#CAP-II#ART-10",
+      "parent_id": "INSTRUCAO-NORMATIVA-SEGES-58-2022#CAP-II",
+      "chunk_level": "ARTICLE",
+      "article_number": "10",
+      "chapter_number": "II",
+      "item_count": 0,
+      "paragraph_count": 3,
+      "token_count": 341,
+      "text": "Art. 10º Durante a elaboração do ETP deverão ser avaliadas:\n§ 1º a possibilidade de utilização de mão de obra, materiais, tecnologias e matérias-primas existentes no local da execução, conservação e operação do bem, serviço ou obra, desde que não haja prejuízos à competitividade do processo licitatório e à eficiência do respectivo contrato, nos termos do § 2º do art. 25 da Lei nº 14.133, de 2021;\n§ 2º a necessidade de ser exigido, em edital ou em aviso de contratação direta, que os serviços de manutenção e assistência técnica sejam prestados mediante deslocamento de técnico ou disponibilizados em unidade de prestação de serviços localizada em distância compatível com suas necessidades, conforme dispõe o § 4º do art. 40 da Lei nº 14.133, de 2021; e\n§ 3º as contratações anteriores voltadas ao atendimento de necessidade idêntica ou semelhante à atual, como forma de melhorar a performance contratual, em especial nas contratações de execução continuada ou de fornecimento contínuo de bens e serviços, com base, inclusive, no relatório final de que trata a alínea \"d\" do inciso VI do § 3º do art. 174 da Lei nº 14.133, de 2021."
+    },
+    {
+      "chunk_id": "INSTRUCAO-NORMATIVA-SEGES-58-2022#CAP-II#ART-11",
+      "parent_id": "INSTRUCAO-NORMATIVA-SEGES-58-2022#CAP-II",
+      "chunk_level": "ARTICLE",
+      "article_number": "11",
+      "chapter_number": "II",
+      "item_count": 0,
+      "paragraph_count": 0,
+      "token_count": 103,
+      "text": "Art. 11º Quando o ETP demonstrar que a avaliação e a ponderação da qualidade técnica das propostas que superarem os requisitos mínimos estabelecidos no edital são relevantes aos fins pretendidos pela Administração, deverá ser escolhido o critério de julgamento de técnica e preço, conforme o disposto no § 1º do art. 36 da Lei nº 14.133, de 2021."
+    },
+    {
+      "chunk_id": "INSTRUCAO-NORMATIVA-SEGES-58-2022#CAP-II#ART-12",
+      "parent_id": "INSTRUCAO-NORMATIVA-SEGES-58-2022#CAP-II",
+      "chunk_level": "ARTICLE",
+      "article_number": "12",
+      "chapter_number": "II",
+      "item_count": 0,
+      "paragraph_count": 0,
+      "token_count": 64,
+      "text": "Art. 12º Na elaboração do ETP, os órgãos e entidades deverão pesquisar, no Sistema ETP Digital, os ETP de outras unidades, como forma de identificar soluções semelhantes que possam se adequar à demanda da Administração."
+    },
+    {
+      "chunk_id": "INSTRUCAO-NORMATIVA-SEGES-58-2022#CAP-II#ART-13",
+      "parent_id": "INSTRUCAO-NORMATIVA-SEGES-58-2022#CAP-II",
+      "chunk_level": "ARTICLE",
+      "article_number": "13",
+      "chapter_number": "II",
+      "item_count": 0,
+      "paragraph_count": 0,
+      "token_count": 49,
+      "text": "Art. 13º Ao final da elaboração do ETP, deve-se avaliar a necessidade de classificá-lo nos termos da Lei nº 12.527, de 18 de novembro de 2011."
+    },
+    {
+      "chunk_id": "INSTRUCAO-NORMATIVA-SEGES-58-2022#CAP-II#ART-14",
+      "parent_id": "INSTRUCAO-NORMATIVA-SEGES-58-2022#CAP-II",
+      "chunk_level": "ARTICLE",
+      "article_number": "14",
+      "chapter_number": "II",
+      "item_count": 2,
+      "paragraph_count": 0,
+      "token_count": 119,
+      "text": "Art. 14º A elaboração do ETP:\nI - é facultada nas hipóteses dos incisos I, II, VII e VIII do art. 75 e do § 7º do art. 90 da Lei nº 14.133, de 2021; e\nII - é dispensada na hipótese do inciso III do art. 75 da Lei nº 14.133, de 2021, e nos casos de prorrogações dos contratos de serviços e fornecimentos contínuos."
+    },
+    {
+      "chunk_id": "INSTRUCAO-NORMATIVA-SEGES-58-2022#CAP-III#ART-15",
+      "parent_id": "INSTRUCAO-NORMATIVA-SEGES-58-2022#CAP-III",
+      "chunk_level": "ARTICLE",
+      "article_number": "15",
+      "chapter_number": "III",
+      "item_count": 0,
+      "paragraph_count": 0,
+      "token_count": 126,
+      "text": "Art. 15º Quando da elaboração do ETP para a contratação de obras e serviços comuns de engenharia, se demonstrada a inexistência de prejuízo para a aferição dos padrões de desempenho e qualidade almejados, a especificação do objeto poderá ser realizada apenas em termo de referência ou em projeto básico, dispensada a elaboração de projetos, conforme disposto no § 3º do art. 18 da Lei nº 14.133, de 1º de abril de 2021."
+    },
+    {
+      "chunk_id": "INSTRUCAO-NORMATIVA-SEGES-58-2022#CAP-III#ART-16",
+      "parent_id": "INSTRUCAO-NORMATIVA-SEGES-58-2022#CAP-III",
+      "chunk_level": "ARTICLE",
+      "article_number": "16",
+      "chapter_number": "III",
+      "item_count": 0,
+      "paragraph_count": 0,
+      "token_count": 60,
+      "text": "Art. 16º Os ETP para as contratações de soluções de tecnologia da informação e comunicação deverão observar as regras específicas do órgão central do Sistema de Administração dos Recursos de Tecnologia da Informação - Sisp."
+    },
+    {
+      "chunk_id": "INSTRUCAO-NORMATIVA-SEGES-58-2022#CAP-IV#ART-17",
+      "parent_id": "INSTRUCAO-NORMATIVA-SEGES-58-2022#CAP-IV",
+      "chunk_level": "ARTICLE",
+      "article_number": "17",
+      "chapter_number": "IV",
+      "item_count": 0,
+      "paragraph_count": 2,
+      "token_count": 175,
+      "text": "Art. 17º Os órgãos, as entidades, os dirigentes e os servidores que utilizarem o Sistema ETP Digital responderão administrativa, civil e penalmente por ato ou fato que caracterize o uso indevido de senhas de acesso ou que transgrida as normas de segurança instituídas.\n§ 1º Os órgãos e as entidades assegurarão o sigilo e a integridade dos dados e informações constantes do Sistema ETP digital e o protegerão contra danos e utilizações indevidas ou desautorizadas.\n§ 2º As informações e os dados do Sistema ETP digital não poderão ser comercializados, sob pena de cancelamento da autorização para o acesso, sem prejuízo das demais cominações legais."
+    },
+    {
+      "chunk_id": "INSTRUCAO-NORMATIVA-SEGES-58-2022#CAP-IV#ART-18",
+      "parent_id": "INSTRUCAO-NORMATIVA-SEGES-58-2022#CAP-IV",
+      "chunk_level": "ARTICLE",
+      "article_number": "18",
+      "chapter_number": "IV",
+      "item_count": 0,
+      "paragraph_count": 0,
+      "token_count": 90,
+      "text": "Art. 18º Os casos omissos serão dirimidos pela Secretaria de Gestão da Secretaria Especial de Desburocratização, Gestão e Governo Digital do Ministério da Economia, que poderá expedir normas complementares para a execução desta norma, bem como disponibilizar informações adicionais em meio eletrônico para fins de operacionalização do Sistema ETP Digital."
+    },
+    {
+      "chunk_id": "INSTRUCAO-NORMATIVA-SEGES-58-2022#CAP-IV#ART-19",
+      "parent_id": "INSTRUCAO-NORMATIVA-SEGES-58-2022#CAP-IV",
+      "chunk_level": "ARTICLE",
+      "article_number": "19",
+      "chapter_number": "IV",
+      "item_count": 0,
+      "paragraph_count": 1,
+      "token_count": 137,
+      "text": "Art. 19º Esta Instrução Normativa entra em vigor em 1º de setembro de 2022.\n§ únicoº Permanecem regidos pela Instrução Normativa nº 40, de 22 de maio de 2020, todos os procedimentos administrativos que forem autuados ou registrados sob a égide da Lei nº 8.666, de 21 de junho de 1993, da Lei nº 10.520, de 17 de junho de 2001, e da Lei nº 12.462, de 4 de agosto de 2011."
+    }
+  ]
+}

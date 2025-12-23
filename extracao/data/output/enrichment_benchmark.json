@@ -1,0 +1,28 @@
+{
+  "model": "Qwen/Qwen3-4B-AWQ",
+  "total_chunks": 3,
+  "success_rate": 1.0,
+  "type_accuracy": 0.6666666666666666,
+  "total_time": 22.20318841934204,
+  "avg_time": 7.401062806447347,
+  "results_summary": [
+    {
+      "article": "3",
+      "success": true,
+      "type_match": true,
+      "elapsed": 9.2514066696167
+    },
+    {
+      "article": "6",
+      "success": true,
+      "type_match": false,
+      "elapsed": 6.430226802825928
+    },
+    {
+      "article": "14",
+      "success": true,
+      "type_match": true,
+      "elapsed": 6.521554946899414
+    }
+  ]
+}

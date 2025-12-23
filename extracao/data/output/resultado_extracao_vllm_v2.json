@@ -1,0 +1,10 @@
+{
+  "data": {},
+  "success": false,
+  "quality_score": 0.0,
+  "extraction_time_seconds": 0.3673,
+  "errors": [
+    "Extraction failed: Error code: 400 - {'error': {'message': \"'max_tokens' or 'max_completion_tokens' is too large: 12288. This model's maximum context length is 16384 tokens and your request has 7921 input tokens (12288 > 16384 - 7921). None\", 'type': 'BadRequestError', 'param': None, 'code': 400}}"
+  ],
+  "warnings": []
+}

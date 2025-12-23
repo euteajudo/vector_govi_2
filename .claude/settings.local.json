@@ -1,0 +1,32 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(curl:*)",
+      "Bash(docker pull:*)",
+      "Bash(dir:*)",
+      "Bash(docker ps:*)",
+      "Bash(ls:*)",
+      "Bash(docker-compose:*)",
+      "Bash(docker logs:*)",
+      "Bash(docker exec:*)",
+      "Bash(docker stats:*)",
+      "WebSearch",
+      "Bash(docker volume:*)",
+      "Bash(docker run --rm -v huggingface-cache:/cache alpine sh -c \"du -sh /cache/* 2>/dev/null || echo ''Cache vazio''\")",
+      "Bash(docker run:*)",
+      "Bash(docker stop:*)",
+      "Bash(.venv/Scripts/pip.exe install:*)",
+      "Bash(.venv/Scripts/python.exe:*)",
+      "Bash(timeout 120 bash:*)",
+      "Bash(D:\\\\2025\\\\pipeline\\\\extracao\\\\.venv\\\\Scripts\\\\python.exe:*)",
+      "Bash(mkdir:*)",
+      "Bash(.venvScriptspython.exe teststest_chunking.py)",
+      "Bash(D:2025pipelineextracao.venvScriptspython.exe D:2025pipelineextracaoteststest_chunking.py)",
+      "Bash(python:*)",
+      "Bash(docker rm:*)",
+      "Bash(timeout:*)",
+      "Bash(D:/2025/pipeline/extracao/.venv/Scripts/python.exe:*)",
+      "Bash(D:/2025/pipeline/extracao/.venv/Scripts/pip.exe install:*)"
+    ]
+  }
+}

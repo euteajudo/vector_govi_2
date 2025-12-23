@@ -1,0 +1,217 @@
+{
+  "document_id": "INSTRUCAO-NORMATIVA-SEGES-58-2022",
+  "total_chunks": 19,
+  "total_tokens": 2913,
+  "processing_time": 174.45676136016846,
+  "chunks": [
+    {
+      "chunk_id": "INSTRUCAO-NORMATIVA-SEGES-58-2022#CAP-I#ART-1",
+      "parent_id": "INSTRUCAO-NORMATIVA-SEGES-58-2022#CAP-I",
+      "chunk_level": "ARTICLE",
+      "text": "Art. 1º Esta Instrução Normativa dispõe sobre a elaboração dos Estudos Técnicos Preliminares ETP, para a aquisição de bens e a contratação de serviços e obras, no âmbito da administração pública federal direta, autárquica e fundacional, e sobre o Sistema ETP digital.",
+      "context_header": "Este artigo da IN 58/2022 define o objeto e o âmbito de aplicação dos estudos técnicos preliminares (ETP) no âmbito federal",
+      "thesis_text": "Estabelece o escopo de aplicação dos ETP para aquisição de bens e contratação de serviços e obras, abrangendo administrações públicas federais, autárquicas e fundacionais, e define o Sistema ETP digital como ferramenta de implementação",
+      "thesis_type": "definicao",
+      "synthetic_questions": "Qual é o objeto principal dos estudos técnicos preliminares segundo a IN 58/2022?\nQuais são as administrações públicas federais que devem aplicar os ETP?\nQuem é responsável por elaborar os ETP conforme o dispositivo?\nQual é o papel do Sistema ETP digital na implementação dos estudos?\nOs ETP são aplicáveis a todas as modalidades de administração pública federal?",
+      "token_count": 66
+    },
+    {
+      "chunk_id": "INSTRUCAO-NORMATIVA-SEGES-58-2022#CAP-I#ART-2",
+      "parent_id": "INSTRUCAO-NORMATIVA-SEGES-58-2022#CAP-I",
+      "chunk_level": "ARTICLE",
+      "text": "Art. 2º Os órgãos e entidades da administração pública estadual, distrital ou municipal, direta ou indireta, quando executarem recursos da União decorrentes de transferências voluntárias, deverão observar as regras e os procedimentos de que dispõe esta Instrução Normativa.",
+      "context_header": "Artigo 2 da IN 58/2022 estabelece que órgãos e entidades estaduais, distritais e municipais devem seguir as regras da instrução normativa ao usar recursos da União por transferências voluntárias.",
+      "thesis_text": "O dispositivo exige que entidades públicas estaduais, distritais e municipais adotem as normas e procedimentos da IN 58/2022 quando utilizarem recursos da União provenientes de transferências voluntárias.",
+      "thesis_type": "requisito",
+      "synthetic_questions": "Quais entidades devem seguir as regras da IN 58/2022 ao usar recursos da União?\nO que determina o artigo 2 da IN 58/2022 em relação ao uso de recursos da União?\nQuais são as consequências de não seguir as regras da instrução normativa?\nComo as entidades estaduais devem aplicar as regras da IN 58/2022?\nO que acontece se uma entidade municipal não seguir os procedimentos da instrução normativa?",
+      "token_count": 68
+    },
+    {
+      "chunk_id": "INSTRUCAO-NORMATIVA-SEGES-58-2022#CAP-I#ART-3",
+      "parent_id": "INSTRUCAO-NORMATIVA-SEGES-58-2022#CAP-I",
+      "chunk_level": "ARTICLE",
+      "text": "Art. 3º Para fins do disposto nesta Instrução Normativa, considera-se:\nI - Estudo Técnico Preliminar - ETP: documento constitutivo da primeira etapa do planejamento de uma contratação que caracteriza o interesse público envolvido e a sua melhor solução e dá base ao anteprojeto, ao termo de referência ou ao projeto básico a serem elaborados caso se conclua pela viabilidade da contratação;\nII - Sistema ETP Digital: ferramenta informatizada integrante da plataforma do Sistema Integrado de Administr...",
+      "context_header": "Este artigo da IN 58/2022 define os conceitos básicos para elaboração de ETP no âmbito federal",
+      "thesis_text": "Estabelece definições de termos técnicos essenciais para a contratação pública, incluindo ETP, requisitante, área técnica e equipe de planejamento, bem como suas relações e possíveis superposição de funções",
+      "thesis_type": "definicao",
+      "synthetic_questions": "Qual é a função do Sistema ETP Digital na contratação pública?\nQuem assume a função de requisitante em uma contratação?\nPode um mesmo órgão ser requisitante e área técnica simultaneamente?\nQuais são as competências da equipe de planejamento da contratação?\nA definição de requisitante exige a criação de novas estruturas organizacionais?",
+      "token_count": 546
+    },
+    {
+      "chunk_id": "INSTRUCAO-NORMATIVA-SEGES-58-2022#CAP-I#ART-4",
+      "parent_id": "INSTRUCAO-NORMATIVA-SEGES-58-2022#CAP-I",
+      "chunk_level": "ARTICLE",
+      "text": "Art. 4º Os ETP deverão ser elaborados no Sistema ETP Digital, observados os procedimentos estabelecidos no manual técnico operacional que será publicado pela Secretaria de Gestão da Secretaria Especial de Desburocratização, Gestão e Governo Digital do Ministério da Economia, disponível no endereço eletrônico www.gov.br/compras, para acesso ao sistema e operacionalização.\n§ 1º Em caso de não utilização do Sistema ETP Digital pelos órgãos e entidades de que trata o art. 2º, a elaboração do ETP dev...",
+      "context_header": "Este artigo da IN 58/2022 estabelece as diretrizes para a elaboração de ETP no âmbito federal",
+      "thesis_text": "O artigo 4 da IN 58/2022 determina que os ETPs devem ser elaborados no Sistema ETP Digital, com exceção de quando não for utilizado, e estabelece indicadores de performance para avaliação de contratos",
+      "thesis_type": "procedimento",
+      "synthetic_questions": "O que é o Sistema ETP Digital e como deve ser utilizado para elaborar ETPs?\nQuais são as exceções para a elaboração de ETPs quando o Sistema ETP Digital não for utilizado?\nComo os indicadores de performance do Sistema ETP Digital são utilizados para avaliar contratos?\nQuem é responsável por publicar o manual técnico operacional do Sistema ETP Digital?\nO Sistema ETP Digital tem critérios específicos para selecionar estudos com melhor desempenho?",
+      "token_count": 194
+    },
+    {
+      "chunk_id": "INSTRUCAO-NORMATIVA-SEGES-58-2022#CAP-I#ART-5",
+      "parent_id": "INSTRUCAO-NORMATIVA-SEGES-58-2022#CAP-I",
+      "chunk_level": "ARTICLE",
+      "text": "Art. 5º A Secretaria de Gestão da Secretaria Especial de Desburocratização, Gestão e Governo Digital do Ministério da Economia poderá ceder o uso do Sistema ETP digital, por meio de termo de acesso, a órgão ou entidade dos Poderes da União, dos Estados, do Distrito Federal e dos Municípios, conforme disposto na Portaria nº 355, de 9 de agosto de 2019.",
+      "context_header": "Este artigo da IN 58/2022 define a possibilidade de ceder o uso do Sistema ETP Digital a entidades públicas",
+      "thesis_text": "Estabelece que a Secretaria pode autorizar o acesso ao Sistema ETP Digital por meio de termo de acesso para órgãos públicos federais, estaduais, distrital e municipais, conforme norma da Portaria 355/2019",
+      "thesis_type": "disposicao",
+      "synthetic_questions": "Quais entidades podem solicitar o acesso ao Sistema ETP Digital?\nComo ocorre a cession de uso do Sistema ETP Digital?\nQual é a base legal para a cession de acesso ao Sistema ETP?\nA cession de uso do Sistema ETP é obrigatória ou opcional?\nO termo de acesso é o instrumento formal para a cession de uso do Sistema ETP?",
+      "token_count": 88
+    },
+    {
+      "chunk_id": "INSTRUCAO-NORMATIVA-SEGES-58-2022#CAP-II#ART-6",
+      "parent_id": "INSTRUCAO-NORMATIVA-SEGES-58-2022#CAP-II",
+      "chunk_level": "ARTICLE",
+      "text": "Art. 6º O ETP deverá evidenciar o problema a ser resolvido e a melhor solução, de modo a permitir a avaliação da viabilidade técnica, socioeconômica e ambiental da contratação.",
+      "context_header": "Este artigo da IN 58/2022 define os requisitos para a elaboração de ETP no âmbito federal",
+      "thesis_text": "O dispositivo exige que o ETP identifique o problema e a melhor solução, assegurando a avaliação de viabilidade técnica, socioeconômica e ambiental da contratação",
+      "thesis_type": "requisito",
+      "synthetic_questions": "Qual é o conteúdo essencial que o ETP deve conter de acordo com este artigo?\nQuem é responsável por garantir a avaliação de viabilidade ambiental?\nPor que é necessário identificar a melhor solução no ETP?\nComo o artigo se relaciona com a análise socioeconômica da contratação?\nQual é o papel do ETP no processo de contratação pública?",
+      "token_count": 44
+    },
+    {
+      "chunk_id": "INSTRUCAO-NORMATIVA-SEGES-58-2022#CAP-II#ART-7",
+      "parent_id": "INSTRUCAO-NORMATIVA-SEGES-58-2022#CAP-II",
+      "chunk_level": "ARTICLE",
+      "text": "Art. 7º O ETP deverá estar alinhado com o Plano de Contratações Anual e com o Plano Diretor de Logística Sustentável, além de outros instrumentos de planejamento da Administração.",
+      "context_header": "Este artigo da IN 58/2022 estabelece alinhamento obrigatório do ETP com planos de gestão da Administração federal",
+      "thesis_text": "O ETP deve ser compatível com os planos anuais de contratação e de logística sustentável, além de outros instrumentos de planejamento administrativo",
+      "thesis_type": "requisito",
+      "synthetic_questions": "Quais planos devem ser alinhados com o ETP segundo a IN 58/2022?\nO ETP precisa ser compatível com outros instrumentos de planejamento além dos dois mencionados?\nQual é a finalidade do alinhamento do ETP com os planos de logística e contratação?\nQuais são as consequências se o ETP não for alinhado com os instrumentos exigidos?\nComo o ETP deve ser integrado aos planos de gestão da Administração federal?",
+      "token_count": 44
+    },
+    {
+      "chunk_id": "INSTRUCAO-NORMATIVA-SEGES-58-2022#CAP-II#ART-8",
+      "parent_id": "INSTRUCAO-NORMATIVA-SEGES-58-2022#CAP-II",
+      "chunk_level": "ARTICLE",
+      "text": "Art. 8º O ETP será elaborado conjuntamente por servidores da área técnica e requisitante ou, quando houver, pela equipe de planejamento da contratação, observado o § 1º do art. 3º.",
+      "context_header": "Artigo 8 da IN 58/2022 define a colaboração entre técnicos e requisitante na elaboração do ETP",
+      "thesis_text": "Estabelece que o ETP deve ser elaborado em conjunto por servidores técnicos e requisitante, com a possibilidade de envolvimento da equipe de planejamento da contratação",
+      "thesis_type": "procedimento",
+      "synthetic_questions": "Quem deve participar da elaboração do ETP conforme o artigo 8?\nPode o requisitante ser o mesmo que a equipe de planejamento da contratação?\nO que acontece se não houver equipe de planejamento da contratação?\nQual é a função do servidor técnico na elaboração do ETP?\nComo é definido o papel do requisitante no processo de elaboração do ETP?",
+      "token_count": 45
+    },
+    {
+      "chunk_id": "INSTRUCAO-NORMATIVA-SEGES-58-2022#CAP-II#ART-9",
+      "parent_id": "INSTRUCAO-NORMATIVA-SEGES-58-2022#CAP-II",
+      "chunk_level": "ARTICLE",
+      "text": "Art. 9º Com base no Plano de Contratações Anual, deverão ser registrados no Sistema ETP Digital os seguintes elementos:\nI - descrição da necessidade da contratação, considerado o problema a ser resolvido sob a perspectiva do interesse público;\nII - descrição dos requisitos da contratação necessários e suficientes à escolha da solução, prevendo critérios e práticas de sustentabilidade, observadas as leis ou regulamentações específicas, bem como padrões mínimos de qualidade e desempenho;\nIII - lev...",
+      "context_header": "Artigo 9 da IN 58/2022 define os elementos obrigatórios para o registro no Sistema ETP Digital",
+      "thesis_text": "O dispositivo estabelece os elementos essenciais que devem ser incluídos no Sistema ETP Digital para a elaboração de planos de contratação anual, com foco em critérios técnicos, econômicos e ambientais.",
+      "thesis_type": "definicao",
+      "synthetic_questions": "Quais elementos são obrigatórios para o registro no Sistema ETP Digital?\nO que determina o inciso III do artigo 9?\nQual a finalidade do levantamento de mercado mencionado no dispositivo?\nQuais critérios de sustentabilidade devem ser considerados na contratação?\nO que deve ser incluído no demonstrativo de resultados da contratação?",
+      "token_count": 781
+    },
+    {
+      "chunk_id": "INSTRUCAO-NORMATIVA-SEGES-58-2022#CAP-II#ART-10",
+      "parent_id": "INSTRUCAO-NORMATIVA-SEGES-58-2022#CAP-II",
+      "chunk_level": "ARTICLE",
+      "text": "Art. 10º Durante a elaboração do ETP deverão ser avaliadas:\n§ 1º a possibilidade de utilização de mão de obra, materiais, tecnologias e matérias-primas existentes no local da execução, conservação e operação do bem, serviço ou obra, desde que não haja prejuízos à competitividade do processo licitatório e à eficiência do respectivo contrato, nos termos do § 2º do art. 25 da Lei nº 14.133, de 2021;\n§ 2º a necessidade de ser exigido, em edital ou em aviso de contratação direta, que os serviços de m...",
+      "context_header": "Este artigo da IN 58/2022 define critérios para avaliação durante a elaboração do ETP no âmbito federal",
+      "thesis_text": "O dispositivo estabelece requisitos para avaliação de recursos existentes, especificação de fornecimento de serviços e utilização de contratações anteriores com objetivos de eficiência contratual",
+      "thesis_type": "requisito",
+      "synthetic_questions": "Quais critérios devem ser avaliados durante a elaboração do ETP?\nComo deve ser especificado o fornecimento de serviços de manutenção?\nQuais contratações anteriores podem ser utilizadas para melhorar a performance contratual?\nExiste vedação para uso de recursos existentes em casos de prejuízo à licitação?\nQual é o objetivo principal da referência ao relatório final de contratações anteriores?",
+      "token_count": 283
+    },
+    {
+      "chunk_id": "INSTRUCAO-NORMATIVA-SEGES-58-2022#CAP-II#ART-11",
+      "parent_id": "INSTRUCAO-NORMATIVA-SEGES-58-2022#CAP-II",
+      "chunk_level": "ARTICLE",
+      "text": "Art. 11º Quando o ETP demonstrar que a avaliação e a ponderação da qualidade técnica das propostas que superarem os requisitos mínimos estabelecidos no edital são relevantes aos fins pretendidos pela Administração, deverá ser escolhido o critério de julgamento de técnica e preço, conforme o disposto no § 1º do art. 36 da Lei nº 14.133, de 2021.",
+      "context_header": "Artigo 11 da IN 58/2022 estabelece critério de julgamento para licitações com base na relevância técnica das propostas",
+      "thesis_text": "O dispositivo define que, quando a qualidade técnica das propostas exceder os requisitos mínimos, a avaliação deve priorizar critérios técnicos e de preço conforme norma legal",
+      "thesis_type": "requisito",
+      "synthetic_questions": "Quando deve ser aplicado o critério técnico-preço em licitações?\nComo o ETP comprova a relevância da qualidade técnica?\nQual a base legal para a aplicação do critério técnico-preço?\nO que acontece se as propostas não superarem os requisitos mínimos?\nComo determinar se a qualidade técnica é relevante para o objeto licitatório?",
+      "token_count": 86
+    },
+    {
+      "chunk_id": "INSTRUCAO-NORMATIVA-SEGES-58-2022#CAP-II#ART-12",
+      "parent_id": "INSTRUCAO-NORMATIVA-SEGES-58-2022#CAP-II",
+      "chunk_level": "ARTICLE",
+      "text": "Art. 12º Na elaboração do ETP, os órgãos e entidades deverão pesquisar, no Sistema ETP Digital, os ETP de outras unidades, como forma de identificar soluções semelhantes que possam se adequar à demanda da Administração.",
+      "context_header": "Art. 12 da IN 58/2022 orienta sobre a busca por ETPs existentes no Sistema ETP Digital durante a elaboração de novos ETPs",
+      "thesis_text": "O artigo 12 da IN 58/2022 exige que órgãos e entidades busquem, no Sistema ETP Digital, ETPs de outras unidades para identificar soluções adaptáveis à demanda da Administração",
+      "thesis_type": "procedimento",
+      "synthetic_questions": "Como os órgãos devem proceder para buscar ETPs de outras unidades?\nQual é o objetivo principal da busca por ETPs no Sistema ETP Digital?\nQuais são as unidades que devem ter seus ETPs consultados?\nO que acontece se não houver ETPs semelhantes em outras unidades?\nDeve o órgão buscar ETPs de outras unidades mesmo que não houver soluções semelhantes?",
+      "token_count": 54
+    },
+    {
+      "chunk_id": "INSTRUCAO-NORMATIVA-SEGES-58-2022#CAP-II#ART-13",
+      "parent_id": "INSTRUCAO-NORMATIVA-SEGES-58-2022#CAP-II",
+      "chunk_level": "ARTICLE",
+      "text": "Art. 13º Ao final da elaboração do ETP, deve-se avaliar a necessidade de classificá-lo nos termos da Lei nº 12.527, de 18 de novembro de 2011.",
+      "context_header": "Artigo 13 da IN 58/2022 orienta sobre a classificação de ETP conforme a Lei 12.527",
+      "thesis_text": "O dispositivo exige que, após a elaboração do ETP, seja verificada a necessidade de sua classificação legal com base na norma 12.527",
+      "thesis_type": "disposicao",
+      "synthetic_questions": "Qual a finalidade da avaliação de classificação do ETP?\nQuem é responsável pela verificação da classificação legal?\nQual a base jurídica para a classificação do ETP?\nO que acontece se o ETP não for classificado conforme a Lei 12.527?\nComo a classificação afeta a validade do ETP?",
+      "token_count": 35
+    },
+    {
+      "chunk_id": "INSTRUCAO-NORMATIVA-SEGES-58-2022#CAP-II#ART-14",
+      "parent_id": "INSTRUCAO-NORMATIVA-SEGES-58-2022#CAP-II",
+      "chunk_level": "ARTICLE",
+      "text": "Art. 14º A elaboração do ETP:\nI - é facultada nas hipóteses dos incisos I, II, VII e VIII do art. 75 e do § 7º do art. 90 da Lei nº 14.133, de 2021; e\nII - é dispensada na hipótese do inciso III do art. 75 da Lei nº 14.133, de 2021, e nos casos de prorrogações dos contratos de serviços e fornecimentos contínuos.",
+      "context_header": "Este artigo da IN 58/2022 define as hipótesis em que a elaboração do ETP é facultativa ou dispensada.",
+      "thesis_text": "Estabelece que a elaboração do ETP é opcional em determinadas hipóteses legais e dispensada em casos específicos de prorrogação de contratos contínuos.",
+      "thesis_type": "excecao",
+      "synthetic_questions": "Quais são as hipótesis em que a elaboração do ETP é facultativa?\nO que determina o inciso III do art. 75 da Lei 14.133/2021?\nA prorrogação de contratos contínuos exime a elaboração do ETP? Como isso é definido?\nPode o mesmo servidor ser requisitante e área técnica em casos de dispensa?\nQuais são as referências legais para as exceções estabelecidas no art. 14?",
+      "token_count": 78
+    },
+    {
+      "chunk_id": "INSTRUCAO-NORMATIVA-SEGES-58-2022#CAP-III#ART-15",
+      "parent_id": "INSTRUCAO-NORMATIVA-SEGES-58-2022#CAP-III",
+      "chunk_level": "ARTICLE",
+      "text": "Art. 15º Quando da elaboração do ETP para a contratação de obras e serviços comuns de engenharia, se demonstrada a inexistência de prejuízo para a aferição dos padrões de desempenho e qualidade almejados, a especificação do objeto poderá ser realizada apenas em termo de referência ou em projeto básico, dispensada a elaboração de projetos, conforme disposto no § 3º do art. 18 da Lei nº 14.133, de 1º de abril de 2021.",
+      "context_header": "Este artigo da IN 58/2022 define as regras para especificação do objeto de contratação de obras e serviços de engenharia em contextos de ETP",
+      "thesis_text": "O dispositivo permite a especificação do objeto de contratação com referência ou projeto básico, desde que comprovada a inexistência de prejuízo para os padrões de desempenho e qualidade, conforme disposto na Lei 14.133/2021",
+      "thesis_type": "excecao",
+      "synthetic_questions": "Quais são os critérios para dispensar a elaboração de projetos detalhados em contratações de engenharia?\nQual a base legal para a exceção de não exigir projetos completos?\nComo comprovar a inexistência de prejuízo para os padrões de qualidade?\nPode o objeto de contratação ser especificado apenas com referência técnica?\nQuais são as consequências de não atender aos requisitos de desempenho estabelecidos?",
+      "token_count": 104
+    },
+    {
+      "chunk_id": "INSTRUCAO-NORMATIVA-SEGES-58-2022#CAP-III#ART-16",
+      "parent_id": "INSTRUCAO-NORMATIVA-SEGES-58-2022#CAP-III",
+      "chunk_level": "ARTICLE",
+      "text": "Art. 16º Os ETP para as contratações de soluções de tecnologia da informação e comunicação deverão observar as regras específicas do órgão central do Sistema de Administração dos Recursos de Tecnologia da Informação - Sisp.",
+      "context_header": "Art. 16 da IN 58/2022 estabelece regras específicas para contratações de soluções de TI e comunicação",
+      "thesis_text": "O dispositivo exige que as ETPs para contratações de soluções de tecnologia da informação e comunicação sigam as regras específicas do órgão central do Sisp",
+      "thesis_type": "requisito",
+      "synthetic_questions": "Quais regras específicas devem ser seguidas pelas ETPs de contratação de TI?\nO órgão central do Sisp define quais diretrizes para as ETPs de TI?\nAs ETPs podem ser elaboradas por qualquer servidor ou apenas por áreas técnicas?\nComo o órgão central do Sisp influencia a validação das ETPs?\nExiste uma exceção para ETPs que não seguirem as regras do Sisp?",
+      "token_count": 55
+    },
+    {
+      "chunk_id": "INSTRUCAO-NORMATIVA-SEGES-58-2022#CAP-IV#ART-17",
+      "parent_id": "INSTRUCAO-NORMATIVA-SEGES-58-2022#CAP-IV",
+      "chunk_level": "ARTICLE",
+      "text": "Art. 17º Os órgãos, as entidades, os dirigentes e os servidores que utilizarem o Sistema ETP Digital responderão administrativa, civil e penalmente por ato ou fato que caracterize o uso indevido de senhas de acesso ou que transgrida as normas de segurança instituídas.\n§ 1º Os órgãos e as entidades assegurarão o sigilo e a integridade dos dados e informações constantes do Sistema ETP digital e o protegerão contra danos e utilizações indevidas ou desautorizadas.\n§ 2º As informações e os dados do S...",
+      "context_header": "Art. 17 da IN 58/2022 estabelece responsabilidades por uso indevido do Sistema ETP Digital",
+      "thesis_text": "O dispositivo define responsabilidades administrativas, civis e penais para uso inadequado de senhas e violação de normas de segurança, além de proibir a comercialização de dados do sistema com penalidades.",
+      "thesis_type": "sancao",
+      "synthetic_questions": "Quais entidades são responsabilizadas por uso indevido do Sistema ETP Digital?\nQual a consequência de transgredir as normas de segurança do sistema?\nO que acontece com o acesso ao sistema se os dados forem comercializados?\nQuais formas de responsabilidade são aplicáveis a servidores que violarem as normas?\nComo é definida a proteção de dados no âmbito do Sistema ETP Digital?",
+      "token_count": 162
+    },
+    {
+      "chunk_id": "INSTRUCAO-NORMATIVA-SEGES-58-2022#CAP-IV#ART-18",
+      "parent_id": "INSTRUCAO-NORMATIVA-SEGES-58-2022#CAP-IV",
+      "chunk_level": "ARTICLE",
+      "text": "Art. 18º Os casos omissos serão dirimidos pela Secretaria de Gestão da Secretaria Especial de Desburocratização, Gestão e Governo Digital do Ministério da Economia, que poderá expedir normas complementares para a execução desta norma, bem como disponibilizar informações adicionais em meio eletrônico para fins de operacionalização do Sistema ETP Digital.",
+      "context_header": "Este artigo da IN 58/2022 define a competência da Secretaria para resolver casos omissos no Sistema ETP Digital",
+      "thesis_text": "Estabelece que a Secretaria Especial tem competência exclusiva para resolver casos omissos no Sistema ETP Digital, podendo emitir normas complementares e disponibilizar informações eletrônicas para operacionalização do sistema",
+      "thesis_type": "competencia",
+      "synthetic_questions": "Quem é competente para resolver casos omissos no Sistema ETP Digital?\nA Secretaria pode expedir normas complementares para o Sistema ETP Digital?\nComo as informações adicionais são disponibilizadas para o Sistema ETP Digital?\nExistem exceções a essa competência da Secretaria?\nComo a Secretaria pode operacionalizar o Sistema ETP Digital com as normas complementares?",
+      "token_count": 88
+    },
+    {
+      "chunk_id": "INSTRUCAO-NORMATIVA-SEGES-58-2022#CAP-IV#ART-19",
+      "parent_id": "INSTRUCAO-NORMATIVA-SEGES-58-2022#CAP-IV",
+      "chunk_level": "ARTICLE",
+      "text": "Art. 19º Esta Instrução Normativa entra em vigor em 1º de setembro de 2022.\n§ únicoº Permanecem regidos pela Instrução Normativa nº 40, de 22 de maio de 2020, todos os procedimentos administrativos que forem autuados ou registrados sob a égide da Lei nº 8.666, de 21 de junho de 1993, da Lei nº 10.520, de 17 de junho de 2001, e da Lei nº 12.462, de 4 de agosto de 2011.",
+      "context_header": "Artigo 19 da IN 58/2022 estabelece a data de vigência e a continuidade de procedimentos administrativos.",
+      "thesis_text": "Define a data de vigência da norma e afirma que procedimentos autorizados por leis anteriores permanecem regidos por outra instrução normativa.",
+      "thesis_type": "disposicao",
+      "synthetic_questions": "Qual a data de vigência da IN 58/2022?\nQuais procedimentos continuam sob a égide da IN 40/2020?\nQuais leis são citadas como base para os procedimentos mencionados?\nPor que a IN 58/2022 não abrange os procedimentos autorizados por essas leis?\nComo a vigência da IN 58/2022 afeta a validade de procedimentos anteriores?",
+      "token_count": 92
+    }
+  ]
+}

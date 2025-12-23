@@ -1,0 +1,129 @@
+{
+  "document_id": "INSTRUCAO-NORMATIVA-SEGESME-65-2021",
+  "total_chunks": 11,
+  "total_tokens": 2678,
+  "processing_time": 80.12158846855164,
+  "chunks": [
+    {
+      "chunk_id": "INSTRUCAO-NORMATIVA-SEGESME-65-2021#CAP-I#ART-1",
+      "parent_id": "INSTRUCAO-NORMATIVA-SEGESME-65-2021#CAP-I",
+      "chunk_level": "ARTICLE",
+      "text": "Art. 1º Esta Instrução Normativa dispõe sobre o procedimento administrativo para a realização de pesquisa de preços para aquisição de bens e contratação de serviços em geral, no âmbito da administração pública federal direta, autárquica e fundacional.\n§ 1º O disposto nesta Instrução Normativa não se aplica às contratações de obras e serviços de engenharia.\n§ 2º Os órgãos e entidades da administração pública estadual, distrital ou municipal, direta ou indireta, quando executarem recursos da União...",
+      "context_header": "Artigo que define o âmbito e procedimentos para pesquisa de preços em administração federal",
+      "thesis_text": "Estabelece o procedimento administrativo para pesquisa de preços em aquisição de bens e serviços, com exceção de obras e engenharia, e aplica-se a entidades federais e estatais com recursos da União.",
+      "thesis_type": "procedimento",
+      "synthetic_questions": "Qual o âmbito de aplicação do procedimento de pesquisa de preços?\nAs contratações de obras e engenharia estão excluídas deste procedimento?\nQuais entidades estaduais devem seguir este procedimento?\nComo se define a vantagem econômica das adesões às atas de preços?\nO procedimento se aplica a contratações de serviços de engenharia?",
+      "token_count": 215
+    },
+    {
+      "chunk_id": "INSTRUCAO-NORMATIVA-SEGESME-65-2021#CAP-I#ART-2",
+      "parent_id": "INSTRUCAO-NORMATIVA-SEGESME-65-2021#CAP-I",
+      "chunk_level": "ARTICLE",
+      "text": "Art. 2º Para fins do disposto nesta Instrução Normativa, considera-se:\nI - preço estimado: valor obtido a partir de método matemático aplicado em série de preços coletados, devendo desconsiderar, na sua formação, os valores inexequíveis, os inconsistentes e os excessivamente elevados;\nII - sobrepreço: preço orçado para licitação ou contratado em valor expressivamente superior aos preços referenciais de mercado, seja de apenas 1 (um) item, se a licitação ou a contratação for por preços unitários ...",
+      "context_header": "Artigo 2 da IN 65/2021 define termos técnicos para aplicação de preços em licitações",
+      "thesis_text": "Estabelece conceitos de preço estimado (baseado em cálculos estatísticos com exclusão de valores anormais) e sobrepreço (preços significativamente acima dos referenciais de mercado, tanto por item quanto por objeto global)",
+      "thesis_type": "definicao",
+      "synthetic_questions": "Como identificar um preço estimado em licitações?\nQuais valores são excluídos do cálculo do preço estimado?\nO que caracteriza um sobrepreço em licitações por serviços unitários?\nComo determinar se um preço é considerado sobrepreço para obras integrais?\nExiste limitação para uso de sobrepreço em contratos de fornecimento?",
+      "token_count": 160
+    },
+    {
+      "chunk_id": "INSTRUCAO-NORMATIVA-SEGESME-65-2021#CAP-II#ART-3",
+      "parent_id": "INSTRUCAO-NORMATIVA-SEGESME-65-2021#CAP-II",
+      "chunk_level": "ARTICLE",
+      "text": "Art. 3º A pesquisa de preços será materializada em documento que conterá, no mínimo:\nI - descrição do objeto a ser contratado;\nII - identificação do(s) agente(s) responsável(is) pela pesquisa ou, se for o caso, da equipe de planejamento;\nIII - caracterização das fontes consultadas;\nIV - série de preços coletados;\nV - método estatístico aplicado para a definição do valor estimado;\nVI - justificativas para a metodologia utilizada, em especial para a desconsideração de valores inconsistentes, inexe...",
+      "context_header": "Artigo 3 da IN 65/2021 define os elementos mínimos que devem constar do documento formalizando a pesquisa de preços.",
+      "thesis_text": "O dispositivo estabelece os requisitos mínimos para a elaboração do documento que formaliza a pesquisa de preços, incluindo descrição do objeto, identificação dos responsáveis, fontes consultadas, série de preços, método estatístico, justificativas e memória de cálculo.",
+      "thesis_type": "requisito",
+      "synthetic_questions": "Quais elementos são obrigatórios no documento da pesquisa de preços?\nQuem deve ser identificado como responsável pela pesquisa de preços?\nO que justifica a exclusão de valores inconsistentes na pesquisa?\nQual é o método estatístico exigido para definir o valor estimado?\nPor que a escolha dos fornecedores precisa ser justificada na pesquisa direta?",
+      "token_count": 185
+    },
+    {
+      "chunk_id": "INSTRUCAO-NORMATIVA-SEGESME-65-2021#CAP-II#ART-4",
+      "parent_id": "INSTRUCAO-NORMATIVA-SEGESME-65-2021#CAP-II",
+      "chunk_level": "ARTICLE",
+      "text": "Art. 4º Na pesquisa de preços, sempre que possível, deverão ser observadas as condições comerciais praticadas, incluindo prazos e locais de entrega, instalação e montagem do bem ou execução do serviço, quantidade contratada, formas e prazos de pagamento, fretes, garantias exigidas e marcas e modelos, quando for o caso, observadas a potencial economia de escala e as peculiaridades do local de execução do objeto.\n§ únicoº No caso de previsão de matriz de alocação de riscos entre o contratante e o ...",
+      "context_header": "Artigo da IN 65/2021 define critérios para elaboração da pesquisa de preço em licitações públicas",
+      "thesis_text": "Estabelece condições comerciais e fatores a serem considerados na pesquisa de preços, incluindo prazos, locais de entrega, garantias, marcas e modelos, além de orientações sobre cálculo de risco em licitações",
+      "thesis_type": "requisito",
+      "synthetic_questions": "Quais fatores devem ser considerados na pesquisa de preços segundo o artigo?\nComo deve ser calculado o valor estimado com matriz de alocação de riscos?\nO que determina o § únicoº sobre a metodologia de cálculo?\nDevem ser observadas as particularidades do local de execução do objeto?\nQuais elementos comerciais praticados devem ser analisados na licitação?",
+      "token_count": 215
+    },
+    {
+      "chunk_id": "INSTRUCAO-NORMATIVA-SEGESME-65-2021#CAP-II#ART-5",
+      "parent_id": "INSTRUCAO-NORMATIVA-SEGESME-65-2021#CAP-II",
+      "chunk_level": "ARTICLE",
+      "text": "Art. 5º A pesquisa de preços para fins de determinação do preço estimado em processo licitatório para a aquisição de bens e contratação de serviços em geral será realizada mediante a utilização dos seguintes parâmetros, empregados de forma combinada ou não:\nI - composição de custos unitários menores ou iguais à mediana do item correspondente nos sistemas oficiais de governo, como Painel de Preços ou banco de preços em saúde, observado o índice de atualização de preços correspondente;\nII - contra...",
+      "context_header": "Artigo da IN 65/2021 define os parâmetros para pesquisa de preços em licitações públicas",
+      "thesis_text": "Estabelece os critérios prioritários para determinação do preço estimado em processos licitatórios, incluindo sistemas oficiais, contratações públicas, dados especializados e cotações diretas, com exigências de validade e documentação específica",
+      "thesis_type": "procedimento",
+      "synthetic_questions": "Quais são os parâmetros prioritários para pesquisa de preços em licitações?\nO que acontece se não houver dados em sistemas oficiais ou contratações públicas?\nQual a exigência mínima para cotações diretas com fornecedores?\nComo deve ser documentada a relação de fornecedores não respondentes?\nQuando é permitido usar orçamentos fora do prazo estipulado?",
+      "token_count": 798
+    },
+    {
+      "chunk_id": "INSTRUCAO-NORMATIVA-SEGESME-65-2021#CAP-II#ART-6",
+      "parent_id": "INSTRUCAO-NORMATIVA-SEGESME-65-2021#CAP-II",
+      "chunk_level": "ARTICLE",
+      "text": "Art. 6º Serão utilizados, como métodos para obtenção do preço estimado, a média, a mediana ou o menor dos valores obtidos na pesquisa de preços, desde que o cálculo incida sobre um conjunto de três ou mais preços, oriundos de um ou mais dos parâmetros de que trata o art. 5º, desconsiderados os valores inexequíveis, inconsistentes e os excessivamente elevados.\n§ 1ºº Poderão ser utilizados outros critérios ou métodos, desde que devidamente justificados nos autos pelo gestor responsável e aprovados...",
+      "context_header": "Art. 6 da IN 65/2021 define a metodologia para obtenção do preço estimado em licitações",
+      "thesis_text": "Estabelece critérios para cálculo do preço estimado com média, mediana ou menor valor, exigindo no mínimo três preços válidos. Permite ajustes percentuais e exceções com base em justificativas e aprovações administrativas.",
+      "thesis_type": "procedimento",
+      "synthetic_questions": "Quais são os métodos permitidos para calcular o preço estimado?\nComo são desconsiderados os preços inválidos ou inconsistentes?\nQual é a exceção para uso de menos de três preços?\nComo ajustar o preço estimado com base no percentual?\nQuem deve aprovar a exceção de menos de três preços?",
+      "token_count": 363
+    },
+    {
+      "chunk_id": "INSTRUCAO-NORMATIVA-SEGESME-65-2021#CAP-III#ART-7",
+      "parent_id": "INSTRUCAO-NORMATIVA-SEGESME-65-2021#CAP-III",
+      "chunk_level": "ARTICLE",
+      "text": "Art. 7º Nas contratações diretas por inexigibilidade ou por dispensa de licitação, aplica-se o disposto no art. 5º.\n§ 1º Quando não for possível estimar o valor do objeto na forma estabelecida no art. 5º, a justificativa de preços será dada com base em valores de contratações de objetos idênticos, comercializados pela futura contratada, por meio da apresentação de notas fiscais emitidas para outros contratantes, públicos ou privados, no período de até 1 (um) ano anterior à data da contratação pe...",
+      "context_header": "Artigo 7 da IN 65/2021 define regras para contratações diretas por inexigibilidade ou dispensa de licitação.",
+      "thesis_text": "Estabelece procedimentos para justificativa de preços em contratações diretas, incluindo uso de notas fiscais de objetos similares e exceções para fornecedores não comercializadores anteriores.",
+      "thesis_type": "procedimento",
+      "synthetic_questions": "Como justificar preços em contratações diretas quando não houver valores estabelecidos?\nQual é a exceção para fornecedores que não comercializaram o objeto anteriormente?\nPor que a contratação direta por inexigibilidade é vedada em alguns casos?\nComo se procede à estimativa de preços em dispensas de licitação under Lei 14.133/2021?\nQuem deve solicitar as cotações para o procedimento descrito no § 4º?",
+      "token_count": 337
+    },
+    {
+      "chunk_id": "INSTRUCAO-NORMATIVA-SEGESME-65-2021#CAP-III#ART-8",
+      "parent_id": "INSTRUCAO-NORMATIVA-SEGESME-65-2021#CAP-III",
+      "chunk_level": "ARTICLE",
+      "text": "Art. 8º Os preços de itens constantes nos Catálogos de Soluções de TIC com Condições Padronizadas, publicados pela Secretaria de Governo Digital da Secretaria Especial de Desburocratização, Gestão e Governo Digital do Ministério da Economia, deverão ser utilizados como preço estimado, salvo se a pesquisa de preços realizada resultar em valor inferior.\n§ únicoº As estimativas de preços constantes em modelos de contratação de soluções de TIC, publicados pela Secretaria de Governo Digital, poderão ...",
+      "context_header": "Este artigo da IN 65/2021 estabelece regras para utilização de preços estimados em contratações de soluções de TIC",
+      "thesis_text": "Define que os preços de soluções de TIC devem ser utilizados como estimados, salvo se houver valor inferior em pesquisa de preços, e permite uso de estimativas em modelos de contratação",
+      "thesis_type": "definicao",
+      "synthetic_questions": "Quais são as condições para utilizar preços estimados em contratações de TIC?\nComo é validada a pesquisa de preços para ajustar os valores estimados?\nPode ser utilizado o preço estimado de um modelo de contratação em soluções de TIC?\nO que acontece se a pesquisa de preços encontrar um valor inferior ao estipulado?\nQuais são os limites para a aplicação das estimativas em contratações de soluções de TIC?",
+      "token_count": 133
+    },
+    {
+      "chunk_id": "INSTRUCAO-NORMATIVA-SEGESME-65-2021#CAP-III#ART-9",
+      "parent_id": "INSTRUCAO-NORMATIVA-SEGESME-65-2021#CAP-III",
+      "chunk_level": "ARTICLE",
+      "text": "Art. 9º Na pesquisa de preço para obtenção do preço estimado relativo às contratações de prestação de serviços com regime de dedicação de mão de obra exclusiva, aplica-se o disposto na Instrução Normativa nº 5, de 26 de maio de 2017, ou outra que venha a substituí-la, observando, no que couber, o disposto nesta Instrução Normativa.",
+      "context_header": "Este artigo da IN 65/2021 estabelece as regras para pesquisa de preço em contratações de serviços com dedicação exclusiva de mão de obra, referenciando a IN 5/2017.",
+      "thesis_text": "O dispositivo define que a pesquisa de preço para contratações de serviços com dedicação exclusiva de mão de obra deve seguir as normas da IN 5/2017 ou suas substitutas, considerando as disposições desta instrução.",
+      "thesis_type": "procedimento",
+      "synthetic_questions": "Qual é o procedimento para pesquisa de preço em contratações com dedicação exclusiva de mão de obra?\nQuais normas aplicam-se à pesquisa de preço para esse tipo de contratação?\nExiste exceção ao uso da IN 5/2017 em contratações de serviços com dedicação exclusiva?\nComo a IN 65/2021 se relaciona com a IN 5/2017 em relação a essa regra?\nQuais etapas devem ser seguidas para determinar o preço estimado em contratações de serviços com dedicação exclusiva?",
+      "token_count": 83
+    },
+    {
+      "chunk_id": "INSTRUCAO-NORMATIVA-SEGESME-65-2021#CAP-IV#ART-10",
+      "parent_id": "INSTRUCAO-NORMATIVA-SEGESME-65-2021#CAP-IV",
+      "chunk_level": "ARTICLE",
+      "text": "Art. 10º Desde que justificado, o orçamento estimado da contratação poderá ter caráter sigiloso, sem prejuízo da divulgação do detalhamento dos quantitativos e das demais informações necessárias para a elaboração das propostas, salvo na hipótese de licitação cujo critério de julgamento for por maior desconto.",
+      "context_header": "Artigo 10 da IN 65/2021 estabelece orientações sobre a confidencialidade do orçamento estimado em licitações",
+      "thesis_text": "Permite que o orçamento estimado da contratação seja sigiloso quando justificado, mas mantém a obrigação de divulgação de detalhes técnicos, exceto em licitações avaliadas por maior desconto",
+      "thesis_type": "disposicao",
+      "synthetic_questions": "Quando o orçamento estimado pode ser considerado sigiloso?\nQual é a exceção para a divulgação dos detalhes técnicos?\nComo justificar a confidencialidade do orçamento?\nA divulgação é obrigatória mesmo em licitações com critério de maior desconto?\nQual é a relação entre a confidencialidade e a elaboração das propostas?",
+      "token_count": 77
+    },
+    {
+      "chunk_id": "INSTRUCAO-NORMATIVA-SEGESME-65-2021#CAP-IV#ART-11",
+      "parent_id": "INSTRUCAO-NORMATIVA-SEGESME-65-2021#CAP-IV",
+      "chunk_level": "ARTICLE",
+      "text": "Art. 11º Esta Instrução Normativa entra em vigor na data de sua publicação.\n§ únicoº Permanecem regidos pela Instrução Normativa nº 73, de 5 de agosto de 2020, todos os procedimentos administrativos autuados ou registrados sob a égide da Lei nº 8.666, de 21 de junho de 1993, da Lei nº 10.520, de 17 de junho de 2001, e da Lei nº 12.462, de 4 de agosto de 2011, incluindo contratações e eventuais renovações ou prorrogações de vigências respectivas.",
+      "context_header": "O artigo 11 da IN 65/2021 estabelece a data de vigência e a continuidade de procedimentos anteriores.",
+      "thesis_text": "Estabelece a data de vigência da IN 65/2021 e confirma a aplicação de procedimentos anteriores sob leis específicas.",
+      "thesis_type": "disposicao",
+      "synthetic_questions": "Qual a data de vigência da IN 65/2021?\nQuais procedimentos continuam sob a égide da IN 73/2020?\nQuais leis são referenciadas no artigo?\nA IN 65/2021 abrange novos procedimentos ou apenas os anteriores?\nO que acontece com contratações anteriores sob as leis citadas?",
+      "token_count": 112
+    }
+  ]
+}

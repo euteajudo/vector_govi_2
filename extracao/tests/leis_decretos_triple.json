@@ -1,0 +1,506 @@
+{
+  "virtual_channel_names": [
+    "by-dev-rootcoord-dml_4_463007240721241901v0"
+  ],
+  "physical_channel_names": [
+    "by-dev-rootcoord-dml_4"
+  ],
+  "aliases": [],
+  "start_positions": [],
+  "properties": [
+    {
+      "key": "collection.timezone",
+      "value": "UTC"
+    }
+  ],
+  "status": {
+    "extra_info": {},
+    "error_code": "Success",
+    "reason": "",
+    "code": 0,
+    "retriable": false,
+    "detail": ""
+  },
+  "schema": {
+    "fields": [
+      {
+        "type_params": [],
+        "index_params": [],
+        "fieldID": "100",
+        "name": "id",
+        "is_primary_key": true,
+        "description": "",
+        "data_type": "Int64",
+        "autoID": true,
+        "state": "FieldCreated",
+        "element_type": "None",
+        "default_value": null,
+        "is_dynamic": false,
+        "is_partition_key": false,
+        "is_clustering_key": false,
+        "nullable": false,
+        "is_function_output": false,
+        "dataType": 5
+      },
+      {
+        "type_params": [
+          {
+            "key": "max_length",
+            "value": "65535"
+          },
+          {
+            "key": "enable_match",
+            "value": "true"
+          },
+          {
+            "key": "enable_analyzer",
+            "value": "true"
+          }
+        ],
+        "index_params": [],
+        "fieldID": "101",
+        "name": "text",
+        "is_primary_key": false,
+        "description": "",
+        "data_type": "VarChar",
+        "autoID": false,
+        "state": "FieldCreated",
+        "element_type": "None",
+        "default_value": null,
+        "is_dynamic": false,
+        "is_partition_key": false,
+        "is_clustering_key": false,
+        "nullable": false,
+        "is_function_output": false,
+        "dataType": 21,
+        "max_length": "65535",
+        "enable_match": "true",
+        "enable_analyzer": "true"
+      },
+      {
+        "type_params": [
+          {
+            "key": "max_length",
+            "value": "65535"
+          }
+        ],
+        "index_params": [],
+        "fieldID": "102",
+        "name": "enriched_text",
+        "is_primary_key": false,
+        "description": "",
+        "data_type": "VarChar",
+        "autoID": false,
+        "state": "FieldCreated",
+        "element_type": "None",
+        "default_value": null,
+        "is_dynamic": false,
+        "is_partition_key": false,
+        "is_clustering_key": false,
+        "nullable": false,
+        "is_function_output": false,
+        "dataType": 21,
+        "max_length": "65535"
+      },
+      {
+        "type_params": [
+          {
+            "key": "dim",
+            "value": "768"
+          }
+        ],
+        "index_params": [],
+        "fieldID": "103",
+        "name": "embedding",
+        "is_primary_key": false,
+        "description": "",
+        "data_type": "FloatVector",
+        "autoID": false,
+        "state": "FieldCreated",
+        "element_type": "None",
+        "default_value": null,
+        "is_dynamic": false,
+        "is_partition_key": false,
+        "is_clustering_key": false,
+        "nullable": false,
+        "is_function_output": false,
+        "dataType": 101,
+        "dim": "768"
+      },
+      {
+        "type_params": [
+          {
+            "key": "dim",
+            "value": "768"
+          }
+        ],
+        "index_params": [],
+        "fieldID": "104",
+        "name": "thesis_embedding",
+        "is_primary_key": false,
+        "description": "",
+        "data_type": "FloatVector",
+        "autoID": false,
+        "state": "FieldCreated",
+        "element_type": "None",
+        "default_value": null,
+        "is_dynamic": false,
+        "is_partition_key": false,
+        "is_clustering_key": false,
+        "nullable": false,
+        "is_function_output": false,
+        "dataType": 101,
+        "dim": "768"
+      },
+      {
+        "type_params": [],
+        "index_params": [],
+        "fieldID": "105",
+        "name": "sparse_vector",
+        "is_primary_key": false,
+        "description": "",
+        "data_type": "SparseFloatVector",
+        "autoID": false,
+        "state": "FieldCreated",
+        "element_type": "None",
+        "default_value": null,
+        "is_dynamic": false,
+        "is_partition_key": false,
+        "is_clustering_key": false,
+        "nullable": false,
+        "is_function_output": true,
+        "dataType": 104
+      },
+      {
+        "type_params": [
+          {
+            "key": "max_length",
+            "value": "2000"
+          }
+        ],
+        "index_params": [],
+        "fieldID": "106",
+        "name": "context_header",
+        "is_primary_key": false,
+        "description": "",
+        "data_type": "VarChar",
+        "autoID": false,
+        "state": "FieldCreated",
+        "element_type": "None",
+        "default_value": null,
+        "is_dynamic": false,
+        "is_partition_key": false,
+        "is_clustering_key": false,
+        "nullable": false,
+        "is_function_output": false,
+        "dataType": 21,
+        "max_length": "2000"
+      },
+      {
+        "type_params": [
+          {
+            "key": "max_length",
+            "value": "5000"
+          }
+        ],
+        "index_params": [],
+        "fieldID": "107",
+        "name": "thesis_text",
+        "is_primary_key": false,
+        "description": "",
+        "data_type": "VarChar",
+        "autoID": false,
+        "state": "FieldCreated",
+        "element_type": "None",
+        "default_value": null,
+        "is_dynamic": false,
+        "is_partition_key": false,
+        "is_clustering_key": false,
+        "nullable": false,
+        "is_function_output": false,
+        "dataType": 21,
+        "max_length": "5000"
+      },
+      {
+        "type_params": [
+          {
+            "key": "max_length",
+            "value": "100"
+          }
+        ],
+        "index_params": [],
+        "fieldID": "108",
+        "name": "thesis_type",
+        "is_primary_key": false,
+        "description": "",
+        "data_type": "VarChar",
+        "autoID": false,
+        "state": "FieldCreated",
+        "element_type": "None",
+        "default_value": null,
+        "is_dynamic": false,
+        "is_partition_key": false,
+        "is_clustering_key": false,
+        "nullable": false,
+        "is_function_output": false,
+        "dataType": 21,
+        "max_length": "100"
+      },
+      {
+        "type_params": [
+          {
+            "key": "max_length",
+            "value": "10000"
+          }
+        ],
+        "index_params": [],
+        "fieldID": "109",
+        "name": "synthetic_questions",
+        "is_primary_key": false,
+        "description": "",
+        "data_type": "VarChar",
+        "autoID": false,
+        "state": "FieldCreated",
+        "element_type": "None",
+        "default_value": null,
+        "is_dynamic": false,
+        "is_partition_key": false,
+        "is_clustering_key": false,
+        "nullable": false,
+        "is_function_output": false,
+        "dataType": 21,
+        "max_length": "10000"
+      },
+      {
+        "type_params": [
+          {
+            "key": "max_length",
+            "value": "500"
+          }
+        ],
+        "index_params": [],
+        "fieldID": "110",
+        "name": "document_id",
+        "is_primary_key": false,
+        "description": "",
+        "data_type": "VarChar",
+        "autoID": false,
+        "state": "FieldCreated",
+        "element_type": "None",
+        "default_value": null,
+        "is_dynamic": false,
+        "is_partition_key": false,
+        "is_clustering_key": false,
+        "nullable": false,
+        "is_function_output": false,
+        "dataType": 21,
+        "max_length": "500"
+      },
+      {
+        "type_params": [
+          {
+            "key": "max_length",
+            "value": "64"
+          }
+        ],
+        "index_params": [],
+        "fieldID": "111",
+        "name": "tipo_documento",
+        "is_primary_key": false,
+        "description": "",
+        "data_type": "VarChar",
+        "autoID": false,
+        "state": "FieldCreated",
+        "element_type": "None",
+        "default_value": null,
+        "is_dynamic": false,
+        "is_partition_key": false,
+        "is_clustering_key": false,
+        "nullable": false,
+        "is_function_output": false,
+        "dataType": 21,
+        "max_length": "64"
+      },
+      {
+        "type_params": [
+          {
+            "key": "max_length",
+            "value": "32"
+          }
+        ],
+        "index_params": [],
+        "fieldID": "112",
+        "name": "numero",
+        "is_primary_key": false,
+        "description": "",
+        "data_type": "VarChar",
+        "autoID": false,
+        "state": "FieldCreated",
+        "element_type": "None",
+        "default_value": null,
+        "is_dynamic": false,
+        "is_partition_key": false,
+        "is_clustering_key": false,
+        "nullable": false,
+        "is_function_output": false,
+        "dataType": 21,
+        "max_length": "32"
+      },
+      {
+        "type_params": [],
+        "index_params": [],
+        "fieldID": "113",
+        "name": "ano",
+        "is_primary_key": false,
+        "description": "",
+        "data_type": "Int64",
+        "autoID": false,
+        "state": "FieldCreated",
+        "element_type": "None",
+        "default_value": null,
+        "is_dynamic": false,
+        "is_partition_key": false,
+        "is_clustering_key": false,
+        "nullable": false,
+        "is_function_output": false,
+        "dataType": 5
+      },
+      {
+        "type_params": [
+          {
+            "key": "max_length",
+            "value": "500"
+          }
+        ],
+        "index_params": [],
+        "fieldID": "114",
+        "name": "section",
+        "is_primary_key": false,
+        "description": "",
+        "data_type": "VarChar",
+        "autoID": false,
+        "state": "FieldCreated",
+        "element_type": "None",
+        "default_value": null,
+        "is_dynamic": false,
+        "is_partition_key": false,
+        "is_clustering_key": false,
+        "nullable": false,
+        "is_function_output": false,
+        "dataType": 21,
+        "max_length": "500"
+      },
+      {
+        "type_params": [
+          {
+            "key": "max_length",
+            "value": "100"
+          }
+        ],
+        "index_params": [],
+        "fieldID": "115",
+        "name": "section_type",
+        "is_primary_key": false,
+        "description": "",
+        "data_type": "VarChar",
+        "autoID": false,
+        "state": "FieldCreated",
+        "element_type": "None",
+        "default_value": null,
+        "is_dynamic": false,
+        "is_partition_key": false,
+        "is_clustering_key": false,
+        "nullable": false,
+        "is_function_output": false,
+        "dataType": 21,
+        "max_length": "100"
+      },
+      {
+        "type_params": [
+          {
+            "key": "max_length",
+            "value": "256"
+          }
+        ],
+        "index_params": [],
+        "fieldID": "116",
+        "name": "section_title",
+        "is_primary_key": false,
+        "description": "",
+        "data_type": "VarChar",
+        "autoID": false,
+        "state": "FieldCreated",
+        "element_type": "None",
+        "default_value": null,
+        "is_dynamic": false,
+        "is_partition_key": false,
+        "is_clustering_key": false,
+        "nullable": false,
+        "is_function_output": false,
+        "dataType": 21,
+        "max_length": "256"
+      },
+      {
+        "type_params": [],
+        "index_params": [],
+        "fieldID": "117",
+        "name": "chunk_index",
+        "is_primary_key": false,
+        "description": "",
+        "data_type": "Int64",
+        "autoID": false,
+        "state": "FieldCreated",
+        "element_type": "None",
+        "default_value": null,
+        "is_dynamic": false,
+        "is_partition_key": false,
+        "is_clustering_key": false,
+        "nullable": false,
+        "is_function_output": false,
+        "dataType": 5
+      }
+    ],
+    "properties": [
+      {
+        "key": "collection.timezone",
+        "value": "UTC"
+      }
+    ],
+    "functions": [
+      {
+        "input_field_names": [
+          "text"
+        ],
+        "input_field_ids": [
+          "101"
+        ],
+        "output_field_names": [
+          "sparse_vector"
+        ],
+        "output_field_ids": [
+          "105"
+        ],
+        "params": [],
+        "name": "bm25_fn",
+        "id": "100",
+        "description": "",
+        "type": "BM25"
+      }
+    ],
+    "name": "leis_decretos_triple",
+    "description": "Busca Tripla: embedding + thesis_embedding + BM25",
+    "autoID": false,
+    "enable_dynamic_field": true,
+    "dbName": ""
+  },
+  "collectionID": "463007240721241901",
+  "created_timestamp": "463021145066831876",
+  "created_utc_timestamp": "1766285496013",
+  "shards_num": 1,
+  "consistency_level": "Strong",
+  "collection_name": "leis_decretos_triple",
+  "db_name": "leis",
+  "num_partitions": "1",
+  "db_id": "0",
+  "request_time": "0"
+}
