@@ -1,0 +1,1441 @@
+{
+  "ingestion_id": "LEI-14133-2021-P2-1766521127",
+  "timestamp": "2025-12-23T20:18:47.721424",
+  "status": "completed",
+  "error": null,
+  "total_duration_seconds": 1939.75,
+  "phases": [
+    {
+      "name": "load",
+      "duration_seconds": 0.0,
+      "items_processed": 1,
+      "errors": 0,
+      "items_per_second": 1000.072
+    },
+    {
+      "name": "parsing",
+      "duration_seconds": 0.01,
+      "items_processed": 375,
+      "errors": 0,
+      "items_per_second": 53569.838
+    },
+    {
+      "name": "extraction",
+      "duration_seconds": 58.84,
+      "items_processed": 75,
+      "errors": 0,
+      "items_per_second": 1.275
+    },
+    {
+      "name": "materialization",
+      "duration_seconds": 0.0,
+      "items_processed": 345,
+      "errors": 0,
+      "items_per_second": 172615.398
+    },
+    {
+      "name": "enrichment",
+      "duration_seconds": 1720.26,
+      "items_processed": 345,
+      "errors": 0,
+      "items_per_second": 0.201
+    },
+    {
+      "name": "embedding",
+      "duration_seconds": 158.25,
+      "items_processed": 345,
+      "errors": 0,
+      "items_per_second": 2.18
+    },
+    {
+      "name": "indexing",
+      "duration_seconds": 2.38,
+      "items_processed": 345,
+      "errors": 0,
+      "items_per_second": 145.036
+    }
+  ],
+  "document": {
+    "document_id": "LEI-14133-2021-P2",
+    "tipo_documento": "LEI",
+    "numero": "14133",
+    "ano": 2021,
+    "articles": {
+      "total": 75,
+      "valid": 75,
+      "suspect": 0,
+      "invalid": 0,
+      "success_rate": "100%"
+    },
+    "coverage": {
+      "paragrafos": "123/123",
+      "paragrafos_pct": "100%",
+      "incisos": "147/147",
+      "incisos_pct": "100%"
+    },
+    "tokens": {
+      "prompt": 0,
+      "completion": 0,
+      "total": 0
+    },
+    "extraction_time_ms": 0,
+    "chunks": {
+      "total": 345,
+      "articles": 75,
+      "paragraphs": 123,
+      "incisos": 147
+    }
+  },
+  "articles": [
+    {
+      "article_id": "ART-088",
+      "article_number": "88",
+      "coverage": {
+        "paragrafos": "6/6",
+        "paragrafos_pct": "100%",
+        "incisos": "0/0",
+        "incisos_pct": "100%"
+      },
+      "status": "valid",
+      "tokens": {
+        "prompt": 0,
+        "completion": 0,
+        "total": 0
+      },
+      "extraction_time_ms": 0,
+      "retry_count": 0
+    },
+    {
+      "article_id": "ART-089",
+      "article_number": "89",
+      "coverage": {
+        "paragrafos": "2/2",
+        "paragrafos_pct": "100%",
+        "incisos": "0/0",
+        "incisos_pct": "100%"
+      },
+      "status": "valid",
+      "tokens": {
+        "prompt": 0,
+        "completion": 0,
+        "total": 0
+      },
+      "extraction_time_ms": 0,
+      "retry_count": 0
+    },
+    {
+      "article_id": "ART-090",
+      "article_number": "90",
+      "coverage": {
+        "paragrafos": "7/7",
+        "paragrafos_pct": "100%",
+        "incisos": "2/2",
+        "incisos_pct": "100%"
+      },
+      "status": "valid",
+      "tokens": {
+        "prompt": 0,
+        "completion": 0,
+        "total": 0
+      },
+      "extraction_time_ms": 0,
+      "retry_count": 0
+    },
+    {
+      "article_id": "ART-091",
+      "article_number": "91",
+      "coverage": {
+        "paragrafos": "4/4",
+        "paragrafos_pct": "100%",
+        "incisos": "0/0",
+        "incisos_pct": "100%"
+      },
+      "status": "valid",
+      "tokens": {
+        "prompt": 0,
+        "completion": 0,
+        "total": 0
+      },
+      "extraction_time_ms": 0,
+      "retry_count": 0
+    },
+    {
+      "article_id": "ART-092",
+      "article_number": "92",
+      "coverage": {
+        "paragrafos": "6/6",
+        "paragrafos_pct": "100%",
+        "incisos": "24/24",
+        "incisos_pct": "100%"
+      },
+      "status": "valid",
+      "tokens": {
+        "prompt": 0,
+        "completion": 0,
+        "total": 0
+      },
+      "extraction_time_ms": 0,
+      "retry_count": 0
+    },
+    {
+      "article_id": "ART-093",
+      "article_number": "93",
+      "coverage": {
+        "paragrafos": "3/3",
+        "paragrafos_pct": "100%",
+        "incisos": "0/0",
+        "incisos_pct": "100%"
+      },
+      "status": "valid",
+      "tokens": {
+        "prompt": 0,
+        "completion": 0,
+        "total": 0
+      },
+      "extraction_time_ms": 0,
+      "retry_count": 0
+    },
+    {
+      "article_id": "ART-094",
+      "article_number": "94",
+      "coverage": {
+        "paragrafos": "5/5",
+        "paragrafos_pct": "100%",
+        "incisos": "2/2",
+        "incisos_pct": "100%"
+      },
+      "status": "valid",
+      "tokens": {
+        "prompt": 0,
+        "completion": 0,
+        "total": 0
+      },
+      "extraction_time_ms": 0,
+      "retry_count": 0
+    },
+    {
+      "article_id": "ART-095",
+      "article_number": "95",
+      "coverage": {
+        "paragrafos": "2/2",
+        "paragrafos_pct": "100%",
+        "incisos": "2/2",
+        "incisos_pct": "100%"
+      },
+      "status": "valid",
+      "tokens": {
+        "prompt": 0,
+        "completion": 0,
+        "total": 0
+      },
+      "extraction_time_ms": 0,
+      "retry_count": 0
+    },
+    {
+      "article_id": "ART-096",
+      "article_number": "96",
+      "coverage": {
+        "paragrafos": "3/3",
+        "paragrafos_pct": "100%",
+        "incisos": "3/3",
+        "incisos_pct": "100%"
+      },
+      "status": "valid",
+      "tokens": {
+        "prompt": 0,
+        "completion": 0,
+        "total": 0
+      },
+      "extraction_time_ms": 0,
+      "retry_count": 0
+    },
+    {
+      "article_id": "ART-097",
+      "article_number": "97",
+      "coverage": {
+        "paragrafos": "1/1",
+        "paragrafos_pct": "100%",
+        "incisos": "2/2",
+        "incisos_pct": "100%"
+      },
+      "status": "valid",
+      "tokens": {
+        "prompt": 0,
+        "completion": 0,
+        "total": 0
+      },
+      "extraction_time_ms": 0,
+      "retry_count": 0
+    },
+    {
+      "article_id": "ART-098",
+      "article_number": "98",
+      "coverage": {
+        "paragrafos": "1/1",
+        "paragrafos_pct": "100%",
+        "incisos": "0/0",
+        "incisos_pct": "100%"
+      },
+      "status": "valid",
+      "tokens": {
+        "prompt": 0,
+        "completion": 0,
+        "total": 0
+      },
+      "extraction_time_ms": 0,
+      "retry_count": 0
+    },
+    {
+      "article_id": "ART-099",
+      "article_number": "99",
+      "coverage": {
+        "paragrafos": "0/0",
+        "paragrafos_pct": "100%",
+        "incisos": "0/0",
+        "incisos_pct": "100%"
+      },
+      "status": "valid",
+      "tokens": {
+        "prompt": 0,
+        "completion": 0,
+        "total": 0
+      },
+      "extraction_time_ms": 0,
+      "retry_count": 0
+    },
+    {
+      "article_id": "ART-100",
+      "article_number": "100",
+      "coverage": {
+        "paragrafos": "0/0",
+        "paragrafos_pct": "100%",
+        "incisos": "0/0",
+        "incisos_pct": "100%"
+      },
+      "status": "valid",
+      "tokens": {
+        "prompt": 0,
+        "completion": 0,
+        "total": 0
+      },
+      "extraction_time_ms": 0,
+      "retry_count": 0
+    },
+    {
+      "article_id": "ART-101",
+      "article_number": "101",
+      "coverage": {
+        "paragrafos": "0/0",
+        "paragrafos_pct": "100%",
+        "incisos": "0/0",
+        "incisos_pct": "100%"
+      },
+      "status": "valid",
+      "tokens": {
+        "prompt": 0,
+        "completion": 0,
+        "total": 0
+      },
+      "extraction_time_ms": 0,
+      "retry_count": 0
+    },
+    {
+      "article_id": "ART-102",
+      "article_number": "102",
+      "coverage": {
+        "paragrafos": "1/1",
+        "paragrafos_pct": "100%",
+        "incisos": "5/5",
+        "incisos_pct": "100%"
+      },
+      "status": "valid",
+      "tokens": {
+        "prompt": 0,
+        "completion": 0,
+        "total": 0
+      },
+      "extraction_time_ms": 0,
+      "retry_count": 0
+    },
+    {
+      "article_id": "ART-103",
+      "article_number": "103",
+      "coverage": {
+        "paragrafos": "6/6",
+        "paragrafos_pct": "100%",
+        "incisos": "2/2",
+        "incisos_pct": "100%"
+      },
+      "status": "valid",
+      "tokens": {
+        "prompt": 0,
+        "completion": 0,
+        "total": 0
+      },
+      "extraction_time_ms": 0,
+      "retry_count": 0
+    },
+    {
+      "article_id": "ART-104",
+      "article_number": "104",
+      "coverage": {
+        "paragrafos": "0/0",
+        "paragrafos_pct": "100%",
+        "incisos": "5/5",
+        "incisos_pct": "100%"
+      },
+      "status": "valid",
+      "tokens": {
+        "prompt": 0,
+        "completion": 0,
+        "total": 0
+      },
+      "extraction_time_ms": 0,
+      "retry_count": 0
+    },
+    {
+      "article_id": "ART-105",
+      "article_number": "105",
+      "coverage": {
+        "paragrafos": "0/0",
+        "paragrafos_pct": "100%",
+        "incisos": "0/0",
+        "incisos_pct": "100%"
+      },
+      "status": "valid",
+      "tokens": {
+        "prompt": 0,
+        "completion": 0,
+        "total": 0
+      },
+      "extraction_time_ms": 0,
+      "retry_count": 0
+    },
+    {
+      "article_id": "ART-106",
+      "article_number": "106",
+      "coverage": {
+        "paragrafos": "2/2",
+        "paragrafos_pct": "100%",
+        "incisos": "3/3",
+        "incisos_pct": "100%"
+      },
+      "status": "valid",
+      "tokens": {
+        "prompt": 0,
+        "completion": 0,
+        "total": 0
+      },
+      "extraction_time_ms": 0,
+      "retry_count": 0
+    },
+    {
+      "article_id": "ART-107",
+      "article_number": "107",
+      "coverage": {
+        "paragrafos": "0/0",
+        "paragrafos_pct": "100%",
+        "incisos": "0/0",
+        "incisos_pct": "100%"
+      },
+      "status": "valid",
+      "tokens": {
+        "prompt": 0,
+        "completion": 0,
+        "total": 0
+      },
+      "extraction_time_ms": 0,
+      "retry_count": 0
+    },
+    {
+      "article_id": "ART-108",
+      "article_number": "108",
+      "coverage": {
+        "paragrafos": "0/0",
+        "paragrafos_pct": "100%",
+        "incisos": "0/0",
+        "incisos_pct": "100%"
+      },
+      "status": "valid",
+      "tokens": {
+        "prompt": 0,
+        "completion": 0,
+        "total": 0
+      },
+      "extraction_time_ms": 0,
+      "retry_count": 0
+    },
+    {
+      "article_id": "ART-109",
+      "article_number": "109",
+      "coverage": {
+        "paragrafos": "0/0",
+        "paragrafos_pct": "100%",
+        "incisos": "0/0",
+        "incisos_pct": "100%"
+      },
+      "status": "valid",
+      "tokens": {
+        "prompt": 0,
+        "completion": 0,
+        "total": 0
+      },
+      "extraction_time_ms": 0,
+      "retry_count": 0
+    },
+    {
+      "article_id": "ART-110",
+      "article_number": "110",
+      "coverage": {
+        "paragrafos": "0/0",
+        "paragrafos_pct": "100%",
+        "incisos": "2/2",
+        "incisos_pct": "100%"
+      },
+      "status": "valid",
+      "tokens": {
+        "prompt": 0,
+        "completion": 0,
+        "total": 0
+      },
+      "extraction_time_ms": 0,
+      "retry_count": 0
+    },
+    {
+      "article_id": "ART-111",
+      "article_number": "111",
+      "coverage": {
+        "paragrafos": "1/1",
+        "paragrafos_pct": "100%",
+        "incisos": "2/2",
+        "incisos_pct": "100%"
+      },
+      "status": "valid",
+      "tokens": {
+        "prompt": 0,
+        "completion": 0,
+        "total": 0
+      },
+      "extraction_time_ms": 0,
+      "retry_count": 0
+    },
+    {
+      "article_id": "ART-112",
+      "article_number": "112",
+      "coverage": {
+        "paragrafos": "0/0",
+        "paragrafos_pct": "100%",
+        "incisos": "0/0",
+        "incisos_pct": "100%"
+      },
+      "status": "valid",
+      "tokens": {
+        "prompt": 0,
+        "completion": 0,
+        "total": 0
+      },
+      "extraction_time_ms": 0,
+      "retry_count": 0
+    },
+    {
+      "article_id": "ART-113",
+      "article_number": "113",
+      "coverage": {
+        "paragrafos": "0/0",
+        "paragrafos_pct": "100%",
+        "incisos": "0/0",
+        "incisos_pct": "100%"
+      },
+      "status": "valid",
+      "tokens": {
+        "prompt": 0,
+        "completion": 0,
+        "total": 0
+      },
+      "extraction_time_ms": 0,
+      "retry_count": 0
+    },
+    {
+      "article_id": "ART-114",
+      "article_number": "114",
+      "coverage": {
+        "paragrafos": "0/0",
+        "paragrafos_pct": "100%",
+        "incisos": "0/0",
+        "incisos_pct": "100%"
+      },
+      "status": "valid",
+      "tokens": {
+        "prompt": 0,
+        "completion": 0,
+        "total": 0
+      },
+      "extraction_time_ms": 0,
+      "retry_count": 0
+    },
+    {
+      "article_id": "ART-115",
+      "article_number": "115",
+      "coverage": {
+        "paragrafos": "7/7",
+        "paragrafos_pct": "100%",
+        "incisos": "0/0",
+        "incisos_pct": "100%"
+      },
+      "status": "valid",
+      "tokens": {
+        "prompt": 0,
+        "completion": 0,
+        "total": 0
+      },
+      "extraction_time_ms": 0,
+      "retry_count": 0
+    },
+    {
+      "article_id": "ART-116",
+      "article_number": "116",
+      "coverage": {
+        "paragrafos": "1/1",
+        "paragrafos_pct": "100%",
+        "incisos": "0/0",
+        "incisos_pct": "100%"
+      },
+      "status": "valid",
+      "tokens": {
+        "prompt": 0,
+        "completion": 0,
+        "total": 0
+      },
+      "extraction_time_ms": 0,
+      "retry_count": 0
+    },
+    {
+      "article_id": "ART-117",
+      "article_number": "117",
+      "coverage": {
+        "paragrafos": "4/4",
+        "paragrafos_pct": "100%",
+        "incisos": "2/2",
+        "incisos_pct": "100%"
+      },
+      "status": "valid",
+      "tokens": {
+        "prompt": 0,
+        "completion": 0,
+        "total": 0
+      },
+      "extraction_time_ms": 0,
+      "retry_count": 0
+    },
+    {
+      "article_id": "ART-118",
+      "article_number": "118",
+      "coverage": {
+        "paragrafos": "0/0",
+        "paragrafos_pct": "100%",
+        "incisos": "0/0",
+        "incisos_pct": "100%"
+      },
+      "status": "valid",
+      "tokens": {
+        "prompt": 0,
+        "completion": 0,
+        "total": 0
+      },
+      "extraction_time_ms": 0,
+      "retry_count": 0
+    },
+    {
+      "article_id": "ART-119",
+      "article_number": "119",
+      "coverage": {
+        "paragrafos": "0/0",
+        "paragrafos_pct": "100%",
+        "incisos": "0/0",
+        "incisos_pct": "100%"
+      },
+      "status": "valid",
+      "tokens": {
+        "prompt": 0,
+        "completion": 0,
+        "total": 0
+      },
+      "extraction_time_ms": 0,
+      "retry_count": 0
+    },
+    {
+      "article_id": "ART-120",
+      "article_number": "120",
+      "coverage": {
+        "paragrafos": "0/0",
+        "paragrafos_pct": "100%",
+        "incisos": "0/0",
+        "incisos_pct": "100%"
+      },
+      "status": "valid",
+      "tokens": {
+        "prompt": 0,
+        "completion": 0,
+        "total": 0
+      },
+      "extraction_time_ms": 0,
+      "retry_count": 0
+    },
+    {
+      "article_id": "ART-121",
+      "article_number": "121",
+      "coverage": {
+        "paragrafos": "5/5",
+        "paragrafos_pct": "100%",
+        "incisos": "5/5",
+        "incisos_pct": "100%"
+      },
+      "status": "valid",
+      "tokens": {
+        "prompt": 0,
+        "completion": 0,
+        "total": 0
+      },
+      "extraction_time_ms": 0,
+      "retry_count": 0
+    },
+    {
+      "article_id": "ART-122",
+      "article_number": "122",
+      "coverage": {
+        "paragrafos": "3/3",
+        "paragrafos_pct": "100%",
+        "incisos": "0/0",
+        "incisos_pct": "100%"
+      },
+      "status": "valid",
+      "tokens": {
+        "prompt": 0,
+        "completion": 0,
+        "total": 0
+      },
+      "extraction_time_ms": 0,
+      "retry_count": 0
+    },
+    {
+      "article_id": "ART-123",
+      "article_number": "123",
+      "coverage": {
+        "paragrafos": "1/1",
+        "paragrafos_pct": "100%",
+        "incisos": "0/0",
+        "incisos_pct": "100%"
+      },
+      "status": "valid",
+      "tokens": {
+        "prompt": 0,
+        "completion": 0,
+        "total": 0
+      },
+      "extraction_time_ms": 0,
+      "retry_count": 0
+    },
+    {
+      "article_id": "ART-124",
+      "article_number": "124",
+      "coverage": {
+        "paragrafos": "2/2",
+        "paragrafos_pct": "100%",
+        "incisos": "2/2",
+        "incisos_pct": "100%"
+      },
+      "status": "valid",
+      "tokens": {
+        "prompt": 0,
+        "completion": 0,
+        "total": 0
+      },
+      "extraction_time_ms": 0,
+      "retry_count": 0
+    },
+    {
+      "article_id": "ART-125",
+      "article_number": "125",
+      "coverage": {
+        "paragrafos": "0/0",
+        "paragrafos_pct": "100%",
+        "incisos": "0/0",
+        "incisos_pct": "100%"
+      },
+      "status": "valid",
+      "tokens": {
+        "prompt": 0,
+        "completion": 0,
+        "total": 0
+      },
+      "extraction_time_ms": 0,
+      "retry_count": 0
+    },
+    {
+      "article_id": "ART-126",
+      "article_number": "126",
+      "coverage": {
+        "paragrafos": "0/0",
+        "paragrafos_pct": "100%",
+        "incisos": "0/0",
+        "incisos_pct": "100%"
+      },
+      "status": "valid",
+      "tokens": {
+        "prompt": 0,
+        "completion": 0,
+        "total": 0
+      },
+      "extraction_time_ms": 0,
+      "retry_count": 0
+    },
+    {
+      "article_id": "ART-127",
+      "article_number": "127",
+      "coverage": {
+        "paragrafos": "0/0",
+        "paragrafos_pct": "100%",
+        "incisos": "0/0",
+        "incisos_pct": "100%"
+      },
+      "status": "valid",
+      "tokens": {
+        "prompt": 0,
+        "completion": 0,
+        "total": 0
+      },
+      "extraction_time_ms": 0,
+      "retry_count": 0
+    },
+    {
+      "article_id": "ART-128",
+      "article_number": "128",
+      "coverage": {
+        "paragrafos": "0/0",
+        "paragrafos_pct": "100%",
+        "incisos": "0/0",
+        "incisos_pct": "100%"
+      },
+      "status": "valid",
+      "tokens": {
+        "prompt": 0,
+        "completion": 0,
+        "total": 0
+      },
+      "extraction_time_ms": 0,
+      "retry_count": 0
+    },
+    {
+      "article_id": "ART-129",
+      "article_number": "129",
+      "coverage": {
+        "paragrafos": "0/0",
+        "paragrafos_pct": "100%",
+        "incisos": "0/0",
+        "incisos_pct": "100%"
+      },
+      "status": "valid",
+      "tokens": {
+        "prompt": 0,
+        "completion": 0,
+        "total": 0
+      },
+      "extraction_time_ms": 0,
+      "retry_count": 0
+    },
+    {
+      "article_id": "ART-130",
+      "article_number": "130",
+      "coverage": {
+        "paragrafos": "0/0",
+        "paragrafos_pct": "100%",
+        "incisos": "0/0",
+        "incisos_pct": "100%"
+      },
+      "status": "valid",
+      "tokens": {
+        "prompt": 0,
+        "completion": 0,
+        "total": 0
+      },
+      "extraction_time_ms": 0,
+      "retry_count": 0
+    },
+    {
+      "article_id": "ART-131",
+      "article_number": "131",
+      "coverage": {
+        "paragrafos": "1/1",
+        "paragrafos_pct": "100%",
+        "incisos": "0/0",
+        "incisos_pct": "100%"
+      },
+      "status": "valid",
+      "tokens": {
+        "prompt": 0,
+        "completion": 0,
+        "total": 0
+      },
+      "extraction_time_ms": 0,
+      "retry_count": 0
+    },
+    {
+      "article_id": "ART-132",
+      "article_number": "132",
+      "coverage": {
+        "paragrafos": "0/0",
+        "paragrafos_pct": "100%",
+        "incisos": "0/0",
+        "incisos_pct": "100%"
+      },
+      "status": "valid",
+      "tokens": {
+        "prompt": 0,
+        "completion": 0,
+        "total": 0
+      },
+      "extraction_time_ms": 0,
+      "retry_count": 0
+    },
+    {
+      "article_id": "ART-133",
+      "article_number": "133",
+      "coverage": {
+        "paragrafos": "0/0",
+        "paragrafos_pct": "100%",
+        "incisos": "4/4",
+        "incisos_pct": "100%"
+      },
+      "status": "valid",
+      "tokens": {
+        "prompt": 0,
+        "completion": 0,
+        "total": 0
+      },
+      "extraction_time_ms": 0,
+      "retry_count": 0
+    },
+    {
+      "article_id": "ART-134",
+      "article_number": "134",
+      "coverage": {
+        "paragrafos": "0/0",
+        "paragrafos_pct": "100%",
+        "incisos": "0/0",
+        "incisos_pct": "100%"
+      },
+      "status": "valid",
+      "tokens": {
+        "prompt": 0,
+        "completion": 0,
+        "total": 0
+      },
+      "extraction_time_ms": 0,
+      "retry_count": 0
+    },
+    {
+      "article_id": "ART-135",
+      "article_number": "135",
+      "coverage": {
+        "paragrafos": "6/6",
+        "paragrafos_pct": "100%",
+        "incisos": "2/2",
+        "incisos_pct": "100%"
+      },
+      "status": "valid",
+      "tokens": {
+        "prompt": 0,
+        "completion": 0,
+        "total": 0
+      },
+      "extraction_time_ms": 0,
+      "retry_count": 0
+    },
+    {
+      "article_id": "ART-136",
+      "article_number": "136",
+      "coverage": {
+        "paragrafos": "0/0",
+        "paragrafos_pct": "100%",
+        "incisos": "4/4",
+        "incisos_pct": "100%"
+      },
+      "status": "valid",
+      "tokens": {
+        "prompt": 0,
+        "completion": 0,
+        "total": 0
+      },
+      "extraction_time_ms": 0,
+      "retry_count": 0
+    },
+    {
+      "article_id": "ART-137",
+      "article_number": "137",
+      "coverage": {
+        "paragrafos": "4/4",
+        "paragrafos_pct": "100%",
+        "incisos": "16/16",
+        "incisos_pct": "100%"
+      },
+      "status": "valid",
+      "tokens": {
+        "prompt": 0,
+        "completion": 0,
+        "total": 0
+      },
+      "extraction_time_ms": 0,
+      "retry_count": 0
+    },
+    {
+      "article_id": "ART-138",
+      "article_number": "138",
+      "coverage": {
+        "paragrafos": "2/2",
+        "paragrafos_pct": "100%",
+        "incisos": "6/6",
+        "incisos_pct": "100%"
+      },
+      "status": "valid",
+      "tokens": {
+        "prompt": 0,
+        "completion": 0,
+        "total": 0
+      },
+      "extraction_time_ms": 0,
+      "retry_count": 0
+    },
+    {
+      "article_id": "ART-139",
+      "article_number": "139",
+      "coverage": {
+        "paragrafos": "2/2",
+        "paragrafos_pct": "100%",
+        "incisos": "4/4",
+        "incisos_pct": "100%"
+      },
+      "status": "valid",
+      "tokens": {
+        "prompt": 0,
+        "completion": 0,
+        "total": 0
+      },
+      "extraction_time_ms": 0,
+      "retry_count": 0
+    },
+    {
+      "article_id": "ART-140",
+      "article_number": "140",
+      "coverage": {
+        "paragrafos": "6/6",
+        "paragrafos_pct": "100%",
+        "incisos": "2/2",
+        "incisos_pct": "100%"
+      },
+      "status": "valid",
+      "tokens": {
+        "prompt": 0,
+        "completion": 0,
+        "total": 0
+      },
+      "extraction_time_ms": 0,
+      "retry_count": 0
+    },
+    {
+      "article_id": "ART-141",
+      "article_number": "141",
+      "coverage": {
+        "paragrafos": "3/3",
+        "paragrafos_pct": "100%",
+        "incisos": "9/9",
+        "incisos_pct": "100%"
+      },
+      "status": "valid",
+      "tokens": {
+        "prompt": 0,
+        "completion": 0,
+        "total": 0
+      },
+      "extraction_time_ms": 0,
+      "retry_count": 0
+    },
+    {
+      "article_id": "ART-142",
+      "article_number": "142",
+      "coverage": {
+        "paragrafos": "1/1",
+        "paragrafos_pct": "100%",
+        "incisos": "0/0",
+        "incisos_pct": "100%"
+      },
+      "status": "valid",
+      "tokens": {
+        "prompt": 0,
+        "completion": 0,
+        "total": 0
+      },
+      "extraction_time_ms": 0,
+      "retry_count": 0
+    },
+    {
+      "article_id": "ART-143",
+      "article_number": "143",
+      "coverage": {
+        "paragrafos": "0/0",
+        "paragrafos_pct": "100%",
+        "incisos": "0/0",
+        "incisos_pct": "100%"
+      },
+      "status": "valid",
+      "tokens": {
+        "prompt": 0,
+        "completion": 0,
+        "total": 0
+      },
+      "extraction_time_ms": 0,
+      "retry_count": 0
+    },
+    {
+      "article_id": "ART-144",
+      "article_number": "144",
+      "coverage": {
+        "paragrafos": "2/2",
+        "paragrafos_pct": "100%",
+        "incisos": "0/0",
+        "incisos_pct": "100%"
+      },
+      "status": "valid",
+      "tokens": {
+        "prompt": 0,
+        "completion": 0,
+        "total": 0
+      },
+      "extraction_time_ms": 0,
+      "retry_count": 0
+    },
+    {
+      "article_id": "ART-145",
+      "article_number": "145",
+      "coverage": {
+        "paragrafos": "3/3",
+        "paragrafos_pct": "100%",
+        "incisos": "0/0",
+        "incisos_pct": "100%"
+      },
+      "status": "valid",
+      "tokens": {
+        "prompt": 0,
+        "completion": 0,
+        "total": 0
+      },
+      "extraction_time_ms": 0,
+      "retry_count": 0
+    },
+    {
+      "article_id": "ART-146",
+      "article_number": "146",
+      "coverage": {
+        "paragrafos": "0/0",
+        "paragrafos_pct": "100%",
+        "incisos": "0/0",
+        "incisos_pct": "100%"
+      },
+      "status": "valid",
+      "tokens": {
+        "prompt": 0,
+        "completion": 0,
+        "total": 0
+      },
+      "extraction_time_ms": 0,
+      "retry_count": 0
+    },
+    {
+      "article_id": "ART-147",
+      "article_number": "147",
+      "coverage": {
+        "paragrafos": "1/1",
+        "paragrafos_pct": "100%",
+        "incisos": "11/11",
+        "incisos_pct": "100%"
+      },
+      "status": "valid",
+      "tokens": {
+        "prompt": 0,
+        "completion": 0,
+        "total": 0
+      },
+      "extraction_time_ms": 0,
+      "retry_count": 0
+    },
+    {
+      "article_id": "ART-148",
+      "article_number": "148",
+      "coverage": {
+        "paragrafos": "2/2",
+        "paragrafos_pct": "100%",
+        "incisos": "0/0",
+        "incisos_pct": "100%"
+      },
+      "status": "valid",
+      "tokens": {
+        "prompt": 0,
+        "completion": 0,
+        "total": 0
+      },
+      "extraction_time_ms": 0,
+      "retry_count": 0
+    },
+    {
+      "article_id": "ART-149",
+      "article_number": "149",
+      "coverage": {
+        "paragrafos": "0/0",
+        "paragrafos_pct": "100%",
+        "incisos": "0/0",
+        "incisos_pct": "100%"
+      },
+      "status": "valid",
+      "tokens": {
+        "prompt": 0,
+        "completion": 0,
+        "total": 0
+      },
+      "extraction_time_ms": 0,
+      "retry_count": 0
+    },
+    {
+      "article_id": "ART-150",
+      "article_number": "150",
+      "coverage": {
+        "paragrafos": "0/0",
+        "paragrafos_pct": "100%",
+        "incisos": "0/0",
+        "incisos_pct": "100%"
+      },
+      "status": "valid",
+      "tokens": {
+        "prompt": 0,
+        "completion": 0,
+        "total": 0
+      },
+      "extraction_time_ms": 0,
+      "retry_count": 0
+    },
+    {
+      "article_id": "ART-151",
+      "article_number": "151",
+      "coverage": {
+        "paragrafos": "1/1",
+        "paragrafos_pct": "100%",
+        "incisos": "0/0",
+        "incisos_pct": "100%"
+      },
+      "status": "valid",
+      "tokens": {
+        "prompt": 0,
+        "completion": 0,
+        "total": 0
+      },
+      "extraction_time_ms": 0,
+      "retry_count": 0
+    },
+    {
+      "article_id": "ART-152",
+      "article_number": "152",
+      "coverage": {
+        "paragrafos": "0/0",
+        "paragrafos_pct": "100%",
+        "incisos": "0/0",
+        "incisos_pct": "100%"
+      },
+      "status": "valid",
+      "tokens": {
+        "prompt": 0,
+        "completion": 0,
+        "total": 0
+      },
+      "extraction_time_ms": 0,
+      "retry_count": 0
+    },
+    {
+      "article_id": "ART-153",
+      "article_number": "153",
+      "coverage": {
+        "paragrafos": "0/0",
+        "paragrafos_pct": "100%",
+        "incisos": "0/0",
+        "incisos_pct": "100%"
+      },
+      "status": "valid",
+      "tokens": {
+        "prompt": 0,
+        "completion": 0,
+        "total": 0
+      },
+      "extraction_time_ms": 0,
+      "retry_count": 0
+    },
+    {
+      "article_id": "ART-154",
+      "article_number": "154",
+      "coverage": {
+        "paragrafos": "0/0",
+        "paragrafos_pct": "100%",
+        "incisos": "0/0",
+        "incisos_pct": "100%"
+      },
+      "status": "valid",
+      "tokens": {
+        "prompt": 0,
+        "completion": 0,
+        "total": 0
+      },
+      "extraction_time_ms": 0,
+      "retry_count": 0
+    },
+    {
+      "article_id": "ART-155",
+      "article_number": "155",
+      "coverage": {
+        "paragrafos": "0/0",
+        "paragrafos_pct": "100%",
+        "incisos": "12/12",
+        "incisos_pct": "100%"
+      },
+      "status": "valid",
+      "tokens": {
+        "prompt": 0,
+        "completion": 0,
+        "total": 0
+      },
+      "extraction_time_ms": 0,
+      "retry_count": 0
+    },
+    {
+      "article_id": "ART-156",
+      "article_number": "156",
+      "coverage": {
+        "paragrafos": "9/9",
+        "paragrafos_pct": "100%",
+        "incisos": "11/11",
+        "incisos_pct": "100%"
+      },
+      "status": "valid",
+      "tokens": {
+        "prompt": 0,
+        "completion": 0,
+        "total": 0
+      },
+      "extraction_time_ms": 0,
+      "retry_count": 0
+    },
+    {
+      "article_id": "ART-157",
+      "article_number": "157",
+      "coverage": {
+        "paragrafos": "0/0",
+        "paragrafos_pct": "100%",
+        "incisos": "0/0",
+        "incisos_pct": "100%"
+      },
+      "status": "valid",
+      "tokens": {
+        "prompt": 0,
+        "completion": 0,
+        "total": 0
+      },
+      "extraction_time_ms": 0,
+      "retry_count": 0
+    },
+    {
+      "article_id": "ART-158",
+      "article_number": "158",
+      "coverage": {
+        "paragrafos": "4/4",
+        "paragrafos_pct": "100%",
+        "incisos": "3/3",
+        "incisos_pct": "100%"
+      },
+      "status": "valid",
+      "tokens": {
+        "prompt": 0,
+        "completion": 0,
+        "total": 0
+      },
+      "extraction_time_ms": 0,
+      "retry_count": 0
+    },
+    {
+      "article_id": "ART-159",
+      "article_number": "159",
+      "coverage": {
+        "paragrafos": "1/1",
+        "paragrafos_pct": "100%",
+        "incisos": "0/0",
+        "incisos_pct": "100%"
+      },
+      "status": "valid",
+      "tokens": {
+        "prompt": 0,
+        "completion": 0,
+        "total": 0
+      },
+      "extraction_time_ms": 0,
+      "retry_count": 0
+    },
+    {
+      "article_id": "ART-160",
+      "article_number": "160",
+      "coverage": {
+        "paragrafos": "0/0",
+        "paragrafos_pct": "100%",
+        "incisos": "0/0",
+        "incisos_pct": "100%"
+      },
+      "status": "valid",
+      "tokens": {
+        "prompt": 0,
+        "completion": 0,
+        "total": 0
+      },
+      "extraction_time_ms": 0,
+      "retry_count": 0
+    },
+    {
+      "article_id": "ART-161",
+      "article_number": "161",
+      "coverage": {
+        "paragrafos": "1/1",
+        "paragrafos_pct": "100%",
+        "incisos": "0/0",
+        "incisos_pct": "100%"
+      },
+      "status": "valid",
+      "tokens": {
+        "prompt": 0,
+        "completion": 0,
+        "total": 0
+      },
+      "extraction_time_ms": 0,
+      "retry_count": 0
+    },
+    {
+      "article_id": "ART-162",
+      "article_number": "162",
+      "coverage": {
+        "paragrafos": "1/1",
+        "paragrafos_pct": "100%",
+        "incisos": "0/0",
+        "incisos_pct": "100%"
+      },
+      "status": "valid",
+      "tokens": {
+        "prompt": 0,
+        "completion": 0,
+        "total": 0
+      },
+      "extraction_time_ms": 0,
+      "retry_count": 0
+    }
+  ]
+}

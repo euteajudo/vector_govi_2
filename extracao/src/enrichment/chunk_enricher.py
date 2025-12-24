@@ -176,6 +176,93 @@ class ChunkEnricher:
             enriched_text=enriched_text,
         )
 
+    def enrich_single(
+        self,
+        text: str,
+        device_type: str,
+        article_number: str,
+        doc_meta: DocumentMetadata,
+        chapter_number: str = "",
+        chapter_title: str = "",
+    ) -> Optional[dict]:
+        """
+        Enriquece um texto diretamente (sem precisar de MaterializedChunk).
+
+        Util para enriquecer chunks ja indexados no Milvus.
+
+        Args:
+            text: Texto do chunk
+            device_type: Tipo (article, paragraph, inciso)
+            article_number: Numero do artigo
+            doc_meta: Metadados do documento
+            chapter_number: Numero do capitulo (opcional)
+            chapter_title: Titulo do capitulo (opcional)
+
+        Returns:
+            Dict com campos de enriquecimento ou None se falhar
+        """
+        start = time.time()
+
+        # Constroi prompt
+        system_prompt, user_prompt = build_enrichment_prompt(
+            text=text,
+            document_type=doc_meta.document_type,
+            number=doc_meta.number,
+            year=doc_meta.year,
+            issuing_body=doc_meta.issuing_body,
+            chapter_number=chapter_number,
+            chapter_title=chapter_title,
+            article_number=article_number,
+            article_title=None,
+        )
+
+        # Chama LLM
+        try:
+            response = self.llm.chat(
+                messages=[
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": user_prompt},
+                ],
+                max_tokens=1024,
+                temperature=0.0,
+            )
+        except Exception as e:
+            self.stats["errors"] += 1
+            print(f"    [WARN] Erro no LLM: {e}")
+            return None
+
+        # Parse resposta
+        try:
+            data = parse_enrichment_response(response)
+        except Exception as e:
+            self.stats["errors"] += 1
+            print(f"    [WARN] Erro no parse: {e}")
+            return None
+
+        # Atualiza estatisticas
+        self.stats["chunks_processed"] += 1
+        self.stats["total_time"] += time.time() - start
+
+        return {
+            "context_header": data.get("context_header", ""),
+            "thesis_text": data.get("thesis_text", ""),
+            "thesis_type": data.get("thesis_type", "disposicao"),
+            "synthetic_questions": data.get("synthetic_questions", "").split("\n") if data.get("synthetic_questions") else [],
+        }
+
+    def _build_enriched_text(
+        self,
+        original_text: str,
+        context_header: str,
+        synthetic_questions: list[str],
+    ) -> str:
+        """Monta texto enriquecido para embedding."""
+        return build_enriched_text(
+            text=original_text,
+            context_header=context_header,
+            synthetic_questions=synthetic_questions,
+        )
+
     def enrich_batch(
         self,
         chunks: list,  # list[MaterializedChunk]

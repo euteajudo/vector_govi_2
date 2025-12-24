@@ -194,6 +194,7 @@ def run_pipeline_v3(
     numero: str = "65",
     ano: int = 2021,
     use_llm: bool = True,
+    use_enrichment: bool = True,
     use_embeddings: bool = True,
     use_milvus: bool = True,
 ):
@@ -207,6 +208,7 @@ def run_pipeline_v3(
         numero: Número do documento
         ano: Ano
         use_llm: Se deve usar LLM para extração
+        use_enrichment: Se deve usar LLM para enriquecimento (context, thesis, questions)
         use_embeddings: Se deve gerar embeddings
         use_milvus: Se deve inserir no Milvus
     """
@@ -391,7 +393,7 @@ def run_pipeline_v3(
 
 
     # 4.5. Enriquecimento com LLM (Contextual Retrieval)
-    if use_llm and all_chunks:
+    if use_enrichment and all_chunks:
         print("\n[4.5/7] Enriquecendo chunks com contexto...")
         collector.start_phase("enrichment")
         enrich_start = time.time()
@@ -430,7 +432,7 @@ def run_pipeline_v3(
             traceback.print_exc()
             collector.end_phase("enrichment", errors=1)
     else:
-        print("\n[4.5/7] Pulando enriquecimento (sem LLM)...")
+        print("\n[4.5/7] Pulando enriquecimento (--no-enrichment)...")
 
     # 5. Gera embeddings
     if use_embeddings:
@@ -526,7 +528,8 @@ def main():
     parser.add_argument("--tipo", default="INSTRUCAO NORMATIVA", help="Tipo do documento")
     parser.add_argument("--numero", default="65", help="Numero do documento")
     parser.add_argument("--ano", type=int, default=2021, help="Ano do documento")
-    parser.add_argument("--no-llm", action="store_true", help="Nao usar LLM")
+    parser.add_argument("--no-llm", action="store_true", help="Nao usar LLM para extracao")
+    parser.add_argument("--no-enrichment", action="store_true", help="Nao usar LLM para enriquecimento (rapido)")
     parser.add_argument("--no-embeddings", action="store_true", help="Nao gerar embeddings")
     parser.add_argument("--no-milvus", action="store_true", help="Nao inserir no Milvus")
 
@@ -542,6 +545,7 @@ def main():
             numero=args.numero,
             ano=args.ano,
             use_llm=not args.no_llm,
+            use_enrichment=not args.no_enrichment,
             use_embeddings=not args.no_embeddings,
             use_milvus=not args.no_milvus,
         )

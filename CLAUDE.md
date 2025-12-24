@@ -2,8 +2,8 @@
 
 > **Projeto**: Sistema RAG para orgaos publicos
 > **Data de Inicio**: 21/12/2024
-> **Ultima Atualizacao**: 23/12/2024
-> **Status**: Fase 4 - RAG Completo ✅ (Retrieval Contextual + MMR Implementado)
+> **Ultima Atualizacao**: 23/12/2024 21:30
+> **Status**: Fase 5 - RAG Completo com Resposta LLM ✅ (Answer Generator + Citações)
 
 ---
 
@@ -1408,6 +1408,97 @@ Query → Detecta Estratégia → Busca Híbrida (Top-K)
 
 O MMR garante diversidade: não retorna 5 incisos similares, mas mix de PAR + INC.
 
+**Tarde - Enriquecimento LLM + HyDE (Contextual Retrieval)**:
+
+Implementamos o sistema completo de enriquecimento de chunks com LLM e HyDE para query expansion.
+
+**Módulo ChunkEnricher** (`src/enrichment/`):
+- Enriquece chunks com contexto, tese e perguntas sintéticas
+- Usa prompts de `enrichment_prompts.py` (Anthropic Contextual Retrieval)
+- Campos preenchidos: `context_header`, `thesis_text`, `thesis_type`, `synthetic_questions`
+- Monta `enriched_text` para embedding: `[CONTEXTO: ...] + texto + [PERGUNTAS: ...]`
+
+**Arquivos criados**:
+```
+src/enrichment/
+  __init__.py           # Exports
+  chunk_enricher.py     # ChunkEnricher, EnrichmentResult
+```
+
+**Integração no Pipeline v3**:
+- Nova fase 4.5: Enriquecimento (entre materialização e embedding)
+- Processa em batches de 5 chunks
+- Usa `Qwen/Qwen3-8B-AWQ` (mesmo modelo único)
+- Tempo: ~5s/chunk (233s para IN 65 com 47 chunks)
+
+**HyDE - Hypothetical Document Embeddings** (`src/search/`):
+- Técnica de query expansion: gera documentos hipotéticos com LLM
+- Combina embeddings da query + docs hipotéticos (40%/60%)
+- Melhora recall para queries ambíguas ou curtas
+- Toggle: `SearchConfig.use_hyde = True/False`
+
+**Arquivos criados**:
+```
+src/search/
+  hyde_expander.py      # HyDEExpander, HyDEResult
+```
+
+**Integração no HybridSearcher**:
+- Propriedade `hyde_expander` com lazy loading
+- Usa HyDE quando `config.use_hyde = True`
+- Gera 3 documentos hipotéticos por query
+- Overhead: +15-20s por query (geração LLM)
+
+**Benchmark HyDE** (23/12/2024):
+
+| Query | Sem HyDE | Com HyDE | Diferença |
+|-------|----------|----------|-----------|
+| "pesquisa de preços" | ART-005, ART-003, ART-004 | ART-005, ART-003, ART-004 | = (query específica) |
+| "fornecedores e cotações" | PAR-007-5, INC-005-IV | PAR-007-5, INC-082-VII, INC-023-IV | +3 novos resultados Lei 14.133 |
+
+**Conclusão HyDE**:
+- Útil para queries curtas/ambíguas
+- Overhead de +15-20s não justifica para queries específicas
+- Recomendado: desabilitado por padrão, habilitado para queries complexas
+
+**Resultados IN 65/2021 com Enriquecimento**:
+```
+Pipeline v3 - Status: completed
+Tempo total: 279.67s
+
+Fases:
+- Load: 0.00s
+- Parsing: 0.00s (57 spans)
+- Extraction: 11.49s (11 artigos válidos)
+- Materialization: 0.00s (47 chunks)
+- Enrichment: 233.05s (47 chunks, 0 erros)
+- Embedding: 33.37s (47 embeddings BGE-M3)
+- Indexing: 1.76s
+
+Cobertura: 100%
+Campos preenchidos: context_header, thesis_text, thesis_type, synthetic_questions, enriched_text
+```
+
+**Resultados Lei 14.133/2021** (sem enriquecimento por timeout):
+```
+Pipeline v3 - Status: completed
+Tempo total: 945.84s
+
+Fases:
+- Extraction: 294.36s (191/204 válidos, 94%)
+- Materialization: 1265 chunks
+- Enrichment: TIMEOUT após 3 batches
+- Embedding: 240.43s (1265 embeddings)
+- Indexing: 2.99s
+
+Chunks no Milvus: 1312 total (47 IN 65 + 1265 Lei 14.133)
+```
+
+**Correção de Bug - Nome do Modelo vLLM**:
+- LLMConfig usava `Qwen/Qwen3-8B` mas container tem `Qwen/Qwen3-8B-AWQ`
+- Corrigido: `for_enrichment()` e `for_extraction()` agora usam `-AWQ`
+- Arquivo: `src/llm/vllm_client.py`
+
 ---
 
 ## 🧪 Benchmark de Modelos LLM (21/12/2024)
@@ -1743,9 +1834,11 @@ r'(?:^|\n)\s*Art\.?\s*(\d+)[°ºo]?(?:\s|\.|\s*[-–—])'  # Art. no início de
 | **SpanParser** | ✅ | Markdown → Spans determinísticos |
 | **ArticleOrchestrator** | ✅ | Extração LLM por artigo com enum dinâmico |
 | **ChunkMaterializer** | ✅ | Parent-child chunks (ART → PAR/INC) |
+| **ChunkEnricher** | ✅ | Enriquecimento LLM (context, thesis, questions) |
 | **BGE-M3** | ✅ | Embeddings dense (1024d) + sparse |
-| **Milvus leis_v3** | ✅ | 47 chunks da IN 65, 30 campos, 8 índices |
+| **Milvus leis_v3** | ✅ | 1312 chunks (IN 65 + Lei 14.133), 30 campos |
 | **Busca Híbrida** | ✅ | Weighted (0.7/0.3) + RRF |
+| **HyDEExpander** | ✅ | Query expansion com documentos hipotéticos |
 | **ContextualRetriever** | ✅ | Parent-child + MMR + Query Router |
 | **CitationValidator** | ✅ | Valida citations ⊆ context_used |
 | **Dashboard** | ✅ | Métricas de cobertura e latência |
@@ -1763,6 +1856,10 @@ r'(?:^|\n)\s*Art\.?\s*(\d+)[°ºo]?(?:\s|\.|\s*[-–—])'  # Art. no início de
 │                                    (parent-child)                       │
 │                                              │                          │
 │                                              ▼                          │
+│                                    ChunkEnricher (LLM)                  │
+│                            (context, thesis, questions)                 │
+│                                              │                          │
+│                                              ▼                          │
 │                              BGE-M3 (dense + sparse)                    │
 │                                              │                          │
 │                                              ▼                          │
@@ -1772,19 +1869,21 @@ r'(?:^|\n)\s*Art\.?\s*(\d+)[°ºo]?(?:\s|\.|\s*[-–—])'  # Art. no início de
 ┌─────────────────────────────────────────────────────────────────────────┐
 │                         PIPELINE DE RETRIEVAL                           │
 ├─────────────────────────────────────────────────────────────────────────┤
-│  Query → Query Router → Busca Híbrida (Weighted/RRF)                    │
+│  Query → [HyDE opcional] → Query Router → Busca Híbrida                 │
 │              │                    │                                     │
 │              ▼                    ▼                                     │
-│    Detecta padrões       Top-K inicial (5)                              │
-│    (art., §, inciso)            │                                       │
-│              │                   ▼                                       │
-│              │          Expande para Pais (1)                           │
+│    Gera docs hipotéticos   Detecta padrões                              │
+│    (se use_hyde=True)      (art., §, inciso)                            │
 │              │                   │                                       │
-│              │                   ▼                                       │
-│              │          MMR Irmãos (4)                                  │
-│              │                   │                                       │
-│              │                   ▼                                       │
-│              └──────────► Contexto Hierárquico                          │
+│              └───────────────────┼───────────────────┐                   │
+│                                  ▼                   ▼                   │
+│                           Top-K inicial (5)    Weighted/RRF             │
+│                                  │                                       │
+│                                  ▼                                       │
+│                          Expande para Pais (1)                          │
+│                                  │                                       │
+│                                  ▼                                       │
+│                          MMR Irmãos (4)                                 │
 │                                  │                                       │
 │                                  ▼                                       │
 │                          CitationValidator                              │
@@ -1795,11 +1894,13 @@ r'(?:^|\n)\s*Art\.?\s*(\d+)[°ºo]?(?:\s|\.|\s*[-–—])'  # Art. no início de
 
 | Métrica | Valor |
 |---------|-------|
-| Cobertura parágrafos | 100% (19/19) |
-| Cobertura incisos | 100% (17/17) |
-| Acurácia retrieval | 80% (4/5 queries) |
-| Tempo ingestão (IN 65) | 30s |
-| Chunks gerados | 47 (11 ART + 19 PAR + 17 INC) |
+| Total chunks Milvus | 1312 (IN 65 + Lei 14.133) |
+| IN 65: Cobertura | 100% (parágrafos e incisos) |
+| IN 65: Chunks enriquecidos | 47/47 (100%) |
+| Lei 14.133: Cobertura | 99% PAR, 100% INC |
+| Lei 14.133: Extração válida | 191/204 (94%) |
+| Tempo ingestão (IN 65 c/ enriquecimento) | 280s |
+| Tempo ingestão (Lei 14.133 s/ enriq.) | 946s |
 
 ### Arquivos Principais
 
@@ -1814,9 +1915,16 @@ extracao/
 │   ├── chunking/
 │   │   ├── chunk_materializer.py    # Parent-child chunks
 │   │   └── chunk_models.py          # LegalChunk, ChunkLevel
+│   ├── enrichment/                  # NOVO (23/12/2024)
+│   │   ├── __init__.py              # Exports
+│   │   └── chunk_enricher.py        # ChunkEnricher (context, thesis, questions)
 │   ├── search/
+│   │   ├── hyde_expander.py         # NOVO: HyDE query expansion
 │   │   ├── contextual_retriever.py  # MMR + Query Router
-│   │   └── hybrid_searcher.py       # Busca híbrida
+│   │   ├── hybrid_searcher.py       # Busca híbrida (HyDE integrado)
+│   │   └── config.py                # SearchConfig (use_hyde toggle)
+│   ├── llm/
+│   │   └── vllm_client.py           # VLLMClient (Qwen/Qwen3-8B-AWQ)
 │   ├── milvus/
 │   │   ├── schema_v3.py             # Schema leis_v3
 │   │   └── schema.py                # Schema legado v2
@@ -1827,7 +1935,7 @@ extracao/
 │   └── rag/
 │       └── answer_models.py         # Answer-JSON
 ├── scripts/
-│   ├── run_pipeline_v3.py           # Pipeline completo
+│   ├── run_pipeline_v3.py           # Pipeline c/ enriquecimento (fase 4.5)
 │   ├── migrate_to_v3.py             # Migração Milvus
 │   └── benchmark_retrieval.py       # Benchmark estratégias
 └── tests/
@@ -1841,9 +1949,16 @@ extracao/
 
 ## 🎯 Próximos Passos (Roadmap)
 
+### Concluído (23/12/2024)
+
+- [x] **ChunkEnricher**: Enriquecimento LLM (context, thesis, questions)
+- [x] **HyDE Query Expansion**: Documentos hipotéticos para queries ambíguas
+- [x] **IN 65 Enriquecida**: 47 chunks com campos preenchidos
+- [x] **Lei 14.133 Indexada**: 1265 chunks (sem enriquecimento por timeout)
+
 ### Curto Prazo (próxima sessão)
 
-- [ ] **Reranker Cross-Encoder**: Adicionar `bge-reranker-v2-m3` entre Top-50 → Top-8
+- [ ] **Enriquecer Lei 14.133**: Re-executar pipeline com timeout maior
 - [ ] **Grid Search de Pesos**: Testar 0.6/0.4 e 0.8/0.2 para Weighted
 - [ ] **Normalização Sparse**: Lower, stopwords jurídicas, de-accent
 - [ ] **Mais documentos**: Indexar IN 58/2022, outras INs
@@ -1884,6 +1999,449 @@ extracao/
 
 ---
 
+## 📅 23/12/2024 - Tarde/Noite: RAG Completo com Resposta LLM
+
+### Resumo da Sessão
+
+Nesta sessão completamos o ciclo RAG end-to-end:
+1. **Celery Pipeline**: Enriquecimento paralelo de chunks
+2. **Answer Generator**: Geração de respostas com citações
+3. **Dashboard Streamlit**: Interface para perguntas
+4. **Primeiro teste bem-sucedido**: Resposta 100% coerente com a lei
+
+### 1. Pipeline Celery para Enriquecimento Paralelo
+
+**Problema**: Lei 14.133 tem 1260 chunks. Enriquecer sequencialmente levaria ~5h.
+
+**Solução**: Celery + Redis para processamento paralelo.
+
+**Arquivos criados**:
+
+```
+src/enrichment/
+├── __init__.py           # Exports do módulo
+├── celery_app.py         # Configuração Celery
+└── tasks.py              # Tasks de enriquecimento
+
+scripts/
+├── run_enrichment_celery.py  # Dispara tasks
+└── check_progress.py         # Monitora progresso
+```
+
+**celery_app.py** - Configuração:
+```python
+from celery import Celery
+
+app = Celery(
+    "enrichment",
+    broker="redis://localhost:6379/0",
+    backend="redis://localhost:6379/0",
+    include=["src.enrichment.tasks"],
+)
+
+app.conf.update(
+    task_time_limit=600,          # 10 min max por task
+    task_default_rate_limit="10/m", # 10 tasks/min (respeita GPU)
+    worker_prefetch_multiplier=1,   # 1 task por vez por worker
+    task_acks_late=True,            # Retry se worker morrer
+)
+```
+
+**tasks.py** - Task de enriquecimento:
+```python
+@app.task(bind=True, max_retries=3, default_retry_delay=30)
+def enrich_chunk_task(self, chunk_id, text, device_type, ...):
+    """Enriquece um chunk e atualiza no Milvus."""
+    # 1. Inicializa LLM e enricher
+    # 2. Gera context_header, thesis_text, synthetic_questions
+    # 3. Gera novos embeddings com enriched_text
+    # 4. Upsert no Milvus (delete + insert)
+```
+
+**Comandos para executar**:
+
+```bash
+# Terminal 1: Redis
+docker run -d --name redis -p 6379:6379 redis:alpine
+
+# Terminais 2-5: Workers Celery (4 workers)
+cd extracao
+celery -A src.enrichment.celery_app worker --loglevel=info --concurrency=1
+
+# Terminal 6: Dispara tasks
+python scripts/run_enrichment_celery.py
+
+# Monitoramento
+python scripts/check_progress.py --watch  # Atualiza a cada 30s
+celery -A src.enrichment.celery_app flower  # Dashboard web :5555
+```
+
+**Resultado**:
+- 4 workers processando em paralelo
+- ~6-13 chunks/min (depende da complexidade)
+- Taxa de sucesso: 100% (com retry automático)
+
+### 2. Answer Generator - Resposta RAG com LLM
+
+**Módulo**: `src/rag/answer_generator.py`
+
+**Fluxo completo**:
+```
+Query do usuário
+       │
+       ▼
+[1. HyDE] LLM gera 3 documentos hipotéticos (opcional)
+       │
+       ▼
+[2. Embedding] BGE-M3 combina query + docs hipotéticos
+       │
+       ▼
+[3. Busca Híbrida] Milvus (dense 50% + sparse 30% + thesis 20%)
+       │
+       ▼
+[4. Reranking] BGE-Reranker cross-encoder (optional)
+       │
+       ▼
+[5. Contexto] Monta chunks para prompt
+       │
+       ▼
+[6. Generation] Qwen 3 8B gera resposta com citações
+       │
+       ▼
+[7. Formatação] Citações legais (Lei X, Art. Y, §Z)
+```
+
+**Uso**:
+```python
+from rag import AnswerGenerator, GenerationConfig
+
+# Modo completo (HyDE + Reranker)
+generator = AnswerGenerator()
+response = generator.generate("Quais os critérios de julgamento?")
+
+print(response.answer)          # Resposta formatada
+print(response.confidence)      # 0.999 (99.9%)
+for citation in response.citations:
+    print(citation.text)        # "Lei 14.133/2021, Art. 33, I"
+
+# Modo rápido (sem HyDE, sem Reranker)
+config = GenerationConfig.fast()
+generator = AnswerGenerator(config=config)
+```
+
+**Estrutura da resposta (AnswerResponse)**:
+```json
+{
+  "success": true,
+  "query": "Quais os critérios de julgamento?",
+  "data": {
+    "answer": "Os critérios de julgamento previstos na Lei 14.133/2021 são...",
+    "confidence": 0.999,
+    "citations": [
+      {
+        "text": "Lei 14.133/2021, Art. 33, I",
+        "short": "Art. 33, I",
+        "document_type": "Lei",
+        "document_number": "14.133",
+        "year": 2021,
+        "article": "33",
+        "device": "inciso",
+        "device_number": "I"
+      }
+    ],
+    "sources": [
+      {"document_id": "LEI-14133-2021", "tipo_documento": "LEI", "ano": 2021}
+    ]
+  },
+  "metadata": {
+    "model": "Qwen/Qwen3-8B-AWQ",
+    "latency_ms": 54650,
+    "retrieval_ms": 25749,
+    "generation_ms": 28900,
+    "chunks_retrieved": 5,
+    "chunks_used": 5
+  }
+}
+```
+
+### 3. Citation Formatter - Citações Legais
+
+**Módulo**: `src/rag/citation_formatter.py`
+
+**Formata citações no padrão jurídico brasileiro**:
+
+| Tipo | Exemplo de Saída |
+|------|------------------|
+| Artigo | Lei 14.133/2021, Art. 33 |
+| Parágrafo | Lei 14.133/2021, Art. 14, Par. 5 |
+| Inciso | Lei 14.133/2021, Art. 33, inciso I |
+| Alínea | Lei 14.133/2021, Art. 14, inciso II, alínea 'a' |
+| § único | IN 65/2021, Art. 3, Parágrafo único |
+
+**Uso**:
+```python
+from rag import CitationFormatter, format_citation
+
+# Simples
+citation = format_citation(
+    tipo_documento="LEI",
+    numero="14133",
+    ano=2021,
+    article_number="33",
+    device_type="inciso",
+    span_id="INC-033-I"
+)
+# -> "Lei 14.133/2021, Art. 33, inciso I"
+
+# Com classe
+formatter = CitationFormatter()
+citation = formatter.format_from_chunk(chunk_data)
+```
+
+### 4. Dashboard Streamlit - Página "Perguntar"
+
+**Arquivo**: `src/dashboard/app.py`
+
+**Nova página adicionada**: "Perguntar"
+
+**Funcionalidades**:
+- Campo de texto para perguntas
+- Configurações: HyDE, Reranker, Top-K
+- Modo Rápido vs Completo
+- Resposta formatada do Qwen 3 8B
+- Citações com artigo/parágrafo/inciso
+- Métricas de latência (retrieval, generation, total)
+- JSON completo para debug
+
+**Como acessar**:
+```bash
+streamlit run src/dashboard/app.py --server.port 8501
+# Acesse http://localhost:8501 → página "Perguntar"
+```
+
+### 5. Índices Milvus - Verificação de Uso
+
+**Todos os índices vetoriais estão sendo utilizados** no modo HYBRID_3WAY:
+
+| Índice | Campo | Peso | Tipo | Status |
+|--------|-------|------|------|--------|
+| HNSW | `dense_vector` | 50% | COSINE | ✅ Usado |
+| HNSW | `thesis_vector` | 20% | COSINE | ✅ Usado |
+| SPARSE_INVERTED | `sparse_vector` | 30% | IP | ✅ Usado |
+
+**Índices escalares** (usados em filtros):
+- `tipo_documento` - INVERTED
+- `ano` - INVERTED
+- `article_number` - INVERTED
+- `device_type` - INVERTED
+- `parent_chunk_id` - INVERTED
+
+### 6. Primeiro Teste Bem-Sucedido
+
+**Query**: "Quais os critérios de julgamento?"
+
+**Resposta do sistema**:
+```
+Os critérios de julgamento previstos na Lei 14.133/2021 são os seguintes:
+
+1. Menor preço – [Art. 33, I].
+2. Maior desconto – [Art. 33, II].
+3. Melhor técnica ou conteúdo artístico – [Art. 33, III].
+4. Técnica e preço – [Art. 33, IV].
+5. Maior lance, no caso de leilão – [Art. 33, V].
+6. Maior retorno econômico – [Art. 33, VI].
+
+Detalhamento de alguns critérios:
+- Julgamento por técnica e preço ([Art. 33, IV]):
+  - Considera a ponderação objetiva entre técnica e preço, com até 70%
+    da pontuação atribuída à proposta técnica ([Art. 36, § 2º]).
+...
+```
+
+**Métricas**:
+- Confiança: **99.9%**
+- Retrieval: 25.7s
+- Generation: 28.9s
+- Total: **54.6s**
+
+**Avaliação**: Resposta **100% coerente** com a Lei 14.133/2021. Citou corretamente Art. 33 com todos os 6 critérios e detalhou Art. 36 sobre técnica e preço.
+
+### 7. Progresso do Enriquecimento (em andamento)
+
+| Documento | Chunks | Enriquecidos | Progresso |
+|-----------|--------|--------------|-----------|
+| IN 65/2021 | 47 | 47 | ✅ 100% |
+| Lei 14.133/2021 | 1260 | ~400 | ⏳ ~32% |
+| **Total** | 1307 | ~447 | **~34%** |
+
+Os 4 workers Celery continuam processando em background.
+
+### 8. Arquivos Criados/Modificados (23/12/2024 tarde)
+
+```
+src/enrichment/
+├── __init__.py              # NOVO: Exports
+├── celery_app.py            # NOVO: Config Celery
+└── tasks.py                 # NOVO: Tasks enriquecimento
+
+src/rag/
+├── __init__.py              # ATUALIZADO: Novos exports
+├── answer_generator.py      # NOVO: Geração resposta RAG
+└── citation_formatter.py    # NOVO: Formatação citações
+
+src/search/
+└── models.py                # ATUALIZADO: Adicionado campo 'ano' e property 'year'
+
+src/dashboard/
+└── app.py                   # ATUALIZADO: Nova página "Perguntar"
+
+scripts/
+├── run_enrichment_celery.py # NOVO: Dispara tasks Celery
+├── check_progress.py        # NOVO: Monitora progresso
+└── test_answer_generator.py # NOVO: Teste do generator
+```
+
+### 9. Lições Aprendidas
+
+| Lição | Contexto |
+|-------|----------|
+| **Celery precisa de imports corretos** | Usar `src.llm.vllm_client` ao invés de `llm.vllm_client` |
+| **Milvus insert row-oriented** | Usar `[{campo: valor}]` ao invés de `{campo: [valor]}` |
+| **Streamlit cache é agressivo** | Reiniciar processo para pegar mudanças em módulos |
+| **HyDE adiciona ~15-20s** | Desativar para queries simples |
+| **Reranker adiciona ~10s** | Mas melhora precisão significativamente |
+| **Qualidade > Velocidade** | Primeiro garantir respostas corretas, depois otimizar |
+
+### 10. Métricas de Latência
+
+| Modo | HyDE | Reranker | Retrieval | Generation | Total |
+|------|------|----------|-----------|------------|-------|
+| Rápido | ❌ | ❌ | ~11s | ~19s | **~30s** |
+| Completo | ✅ | ✅ | ~26s | ~29s | **~55s** |
+
+**Causas da latência**:
+- HyDE: LLM gera 3 documentos hipotéticos (~15s)
+- Reranker: Cross-encoder processa top-20 (~10s)
+- Generation: Resposta longa com citações (~20-30s)
+
+---
+
+## 🎯 Status Atual do Projeto (23/12/2024 21:30)
+
+### Fase Atual: **5 - RAG Completo com Resposta LLM** ✅
+
+| Componente | Status | Descrição |
+|------------|--------|-----------|
+| Extração PDF | ✅ Completo | Docling + SpanParser + ArticleOrchestrator |
+| Chunking | ✅ Completo | ChunkMaterializer com parent-child |
+| Embeddings | ✅ Completo | BGE-M3 (dense + sparse) |
+| Enriquecimento | ⏳ Em andamento | ChunkEnricher (32% Lei 14.133) |
+| Indexação | ✅ Completo | Milvus leis_v3 (1307 chunks) |
+| Busca Híbrida | ✅ Completo | Weighted 3-way + HyDE |
+| Reranking | ✅ Completo | BGE-Reranker cross-encoder |
+| Resposta LLM | ✅ Completo | AnswerGenerator + Qwen 8B |
+| Citações | ✅ Completo | CitationFormatter |
+| Dashboard | ✅ Completo | Streamlit com página "Perguntar" |
+
+### O que funciona end-to-end
+
+```
+Usuário faz pergunta
+        │
+        ▼
+[Dashboard Streamlit] → [AnswerGenerator]
+        │
+        ▼
+[HyDE opcional] → [Busca Híbrida Milvus] → [Reranker]
+        │
+        ▼
+[Monta contexto com chunks] → [Qwen 3 8B gera resposta]
+        │
+        ▼
+[Formata citações] → [Exibe resposta + métricas]
+```
+
+---
+
+## 🚀 Próximos Passos (Atualizado)
+
+### Concluído (23/12/2024)
+
+- [x] **Pipeline Celery**: Enriquecimento paralelo com 4 workers
+- [x] **Answer Generator**: Geração de respostas RAG com citações
+- [x] **Citation Formatter**: Formatação de citações legais
+- [x] **Dashboard "Perguntar"**: Interface para perguntas ao sistema
+- [x] **Primeiro teste bem-sucedido**: Resposta 100% coerente
+
+### Curto Prazo (próxima sessão)
+
+- [ ] **Completar enriquecimento Lei 14.133**: Aguardar Celery (~4h restantes)
+- [ ] **Otimizar latência**: Cache de embeddings, streaming response
+- [ ] **API FastAPI**: Endpoints `/ask`, `/search`, `/ingest`
+- [ ] **Streaming response**: Mostrar resposta enquanto gera
+
+### Médio Prazo
+
+- [ ] **Cache de queries**: Perguntas frequentes pré-computadas
+- [ ] **Avaliação RAGAS**: Métricas de qualidade (faithfulness, relevance)
+- [ ] **Mais documentos**: Indexar Decretos, outras Leis
+- [ ] **Fine-tuning prompts**: Melhorar precisão das respostas
+
+### Longo Prazo (Produção)
+
+- [ ] **UI React/Next.js**: Interface profissional
+- [ ] **PDF Viewer**: Clique na citação → pula para página
+- [ ] **Multi-tenant**: Suporte a múltiplos órgãos
+- [ ] **GPU maior**: RTX 4090 para latência 2x menor
+- [ ] **Kubernetes**: Deploy escalável
+
+---
+
+## 📊 Comandos Úteis
+
+### Iniciar Sistema Completo
+
+```bash
+# 1. Docker (Milvus + vLLM)
+docker start milvus-standalone vllm
+
+# 2. Redis (para Celery)
+docker run -d --name redis -p 6379:6379 redis:alpine
+
+# 3. Workers Celery (abrir 4 terminais)
+cd extracao
+celery -A src.enrichment.celery_app worker --loglevel=info --concurrency=1
+
+# 4. Dashboard Streamlit
+streamlit run src/dashboard/app.py --server.port 8501
+```
+
+### Monitoramento
+
+```bash
+# Progresso do enriquecimento
+python scripts/check_progress.py --watch
+
+# Dashboard Celery (Flower)
+celery -A src.enrichment.celery_app flower
+# Acesse http://localhost:5555
+
+# Logs do vLLM
+docker logs -f vllm
+```
+
+### Testar Resposta RAG
+
+```bash
+# Via linha de comando
+python scripts/test_answer_generator.py --query "Quando o ETP pode ser dispensado?"
+
+# Modo rápido (sem HyDE)
+python scripts/test_answer_generator.py --fast --query "Quais os critérios de julgamento?"
+```
+
+---
+
 ## 🔗 Referências
 
 - [Docling Documentation](https://ds4sd.github.io/docling/)
@@ -1894,3 +2452,5 @@ extracao/
 - [Ollama](https://ollama.com/) - Runtime local para LLMs
 - [LlamaExtract](https://developers.llamaindex.ai/python/cloud/llamaextract/) - Inspiração para API
 - [vLLM](https://docs.vllm.ai/) - Runtime de produção
+- [Celery Documentation](https://docs.celeryq.dev/) - Task queue
+- [Streamlit Documentation](https://docs.streamlit.io/) - Dashboard

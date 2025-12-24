@@ -93,7 +93,8 @@ class AnswerMetadata:
     latency_ms: int = 0
     tokens_prompt: int = 0
     tokens_completion: int = 0
-    retrieval_latency_ms: int = 0
+    retrieval_ms: int = 0
+    generation_ms: int = 0
     chunks_retrieved: int = 0
     chunks_used: int = 0
     timestamp: str = field(default_factory=lambda: datetime.utcnow().isoformat())
@@ -103,7 +104,8 @@ class AnswerMetadata:
             "model": self.model,
             "latency_ms": self.latency_ms,
             "tokens_used": self.tokens_prompt + self.tokens_completion,
-            "retrieval_latency_ms": self.retrieval_latency_ms,
+            "retrieval_ms": self.retrieval_ms,
+            "generation_ms": self.generation_ms,
             "chunks_retrieved": self.chunks_retrieved,
             "chunks_used": self.chunks_used,
             "timestamp": self.timestamp,
@@ -115,33 +117,51 @@ class AnswerResponse:
     """
     Resposta estruturada para o front-end.
 
-    Formato JSON-API compatível para fácil integração.
+    Formato JSON-API compativel para facil integracao.
     """
-
-    # Conteúdo principal
-    answer: str             # Texto da resposta
-    confidence: float       # Confiança geral (0-1)
-
-    # Citações e fontes
-    citations: list[Citation] = field(default_factory=list)
-    sources: list[Source] = field(default_factory=list)
-
-    # Metadados
-    metadata: AnswerMetadata = field(default_factory=AnswerMetadata)
 
     # Status
     success: bool = True
     error: Optional[str] = None
 
+    # Query original
+    query: str = ""
+
+    # Conteudo principal
+    answer: str = ""        # Texto da resposta
+    confidence: float = 0.0 # Confianca geral (0-1)
+
+    # Citacoes e fontes (aceita qualquer objeto com to_dict())
+    citations: list = field(default_factory=list)
+    sources: list = field(default_factory=list)
+
+    # Metadados
+    metadata: AnswerMetadata = field(default_factory=AnswerMetadata)
+
     def to_dict(self) -> dict:
-        """Converte para dicionário JSON-serializável."""
+        """Converte para dicionario JSON-serializavel."""
+        citations_list = []
+        for c in self.citations:
+            if hasattr(c, 'to_dict'):
+                citations_list.append(c.to_dict())
+            elif isinstance(c, dict):
+                citations_list.append(c)
+
+        sources_list = []
+        for s in self.sources:
+            if hasattr(s, 'to_dict'):
+                sources_list.append(s.to_dict())
+            elif isinstance(s, dict):
+                sources_list.append(s)
+
         return {
             "success": self.success,
+            "query": self.query,
             "data": {
                 "answer": self.answer,
                 "confidence": round(self.confidence, 3),
-                "citations": [c.to_dict() for c in self.citations],
-                "sources": [s.to_dict() for s in self.sources],
+                "citations": citations_list,
+                "sources": sources_list,
             },
             "metadata": self.metadata.to_dict(),
             "error": self.error,

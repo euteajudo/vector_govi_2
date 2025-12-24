@@ -83,9 +83,12 @@ def get_collection_stats():
     try:
         from pymilvus import Collection, connections
 
-        # Garante que a conexão existe
-        if not connections.has_connection("default"):
-            get_milvus_connection()
+        # Sempre reconecta para garantir conexão válida
+        try:
+            connections.disconnect("default")
+        except:
+            pass
+        connections.connect(alias="default", host="localhost", port="19530")
 
         collection = Collection("leis_v3")
         collection.load()
@@ -245,6 +248,18 @@ def page_search():
 
         st.divider()
 
+        # HyDE (Hypothetical Document Embeddings)
+        st.subheader("Query Expansion")
+        use_hyde = st.checkbox(
+            "Usar HyDE",
+            value=False,
+            help="Gera documentos hipotéticos para melhorar recall em queries ambíguas. Adiciona ~15-20s de latência."
+        )
+        if use_hyde:
+            st.info("HyDE ativo: O LLM irá gerar documentos hipotéticos para expandir a query.")
+
+        st.divider()
+
         # Filtros
         st.subheader("Filtros")
         filter_tipo = st.selectbox(
@@ -276,7 +291,11 @@ def page_search():
                 from search.config import RerankMode
 
                 # Configura busca
-                config = SearchConfig.default()
+                if use_hyde:
+                    config = SearchConfig.with_hyde()
+                else:
+                    config = SearchConfig.default()
+
                 if not use_reranker:
                     config.rerank_mode = RerankMode.NONE
 
@@ -299,6 +318,11 @@ def page_search():
 
                 # Mostra métricas
                 st.divider()
+
+                # Indicador HyDE
+                if use_hyde:
+                    st.success("🔮 Busca com HyDE (Query Expansion ativo)")
+
                 col1, col2, col3, col4 = st.columns(4)
 
                 with col1:
@@ -358,6 +382,156 @@ def page_search():
 
             except Exception as e:
                 st.error(f"Erro na busca: {e}")
+                import traceback
+                st.code(traceback.format_exc())
+
+
+# =============================================================================
+# PÁGINA: PERGUNTAR (RAG com LLM)
+# =============================================================================
+
+def page_ask():
+    """Pagina para fazer perguntas e obter respostas do LLM."""
+    st.header("Perguntar ao Sistema RAG")
+
+    st.markdown("""
+    Esta pagina usa o **AnswerGenerator** para:
+    1. Buscar chunks relevantes no Milvus (HyDE + Busca Hibrida)
+    2. Rerankear com cross-encoder
+    3. Gerar resposta com **Qwen 3 8B**
+    4. Formatar citacoes legais
+    """)
+
+    # Verifica conexoes
+    if not get_milvus_connection():
+        st.error("Milvus nao esta conectado.")
+        return
+
+    # Configuracoes na sidebar
+    with st.sidebar:
+        st.subheader("Configuracoes RAG")
+
+        top_k = st.slider("Chunks para contexto", 3, 10, 5)
+
+        use_hyde = st.checkbox(
+            "Usar HyDE",
+            value=True,
+            help="Gera documentos hipoteticos para melhorar busca semantica"
+        )
+
+        use_reranker = st.checkbox(
+            "Usar Reranker",
+            value=True,
+            help="Reordena resultados com cross-encoder"
+        )
+
+        st.divider()
+
+        mode = st.radio(
+            "Modo",
+            ["Completo", "Rapido"],
+            help="Rapido: sem HyDE e sem reranker"
+        )
+
+        if mode == "Rapido":
+            use_hyde = False
+            use_reranker = False
+
+    # Campo de pergunta
+    st.subheader("Sua Pergunta")
+
+    query = st.text_area(
+        "Digite sua pergunta sobre licitacoes e contratacoes:",
+        placeholder="Ex: Quando o ETP pode ser dispensado?",
+        height=100,
+    )
+
+    col1, col2 = st.columns([1, 5])
+    with col1:
+        ask_button = st.button("Perguntar", type="primary", use_container_width=True)
+
+    if ask_button and query:
+        with st.spinner("Gerando resposta..."):
+            try:
+                from rag import AnswerGenerator, GenerationConfig
+
+                # Configura gerador
+                if mode == "Rapido":
+                    config = GenerationConfig.fast()
+                else:
+                    config = GenerationConfig.default()
+                    config.use_hyde = use_hyde
+                    config.use_reranker = use_reranker
+                    config.top_k = top_k
+
+                # Gera resposta
+                with AnswerGenerator(config=config) as generator:
+                    response = generator.generate(query, top_k=top_k)
+
+                st.divider()
+
+                # Metricas
+                col1, col2, col3, col4 = st.columns(4)
+
+                with col1:
+                    st.metric("Confianca", f"{response.confidence:.1%}")
+                with col2:
+                    st.metric("Retrieval", f"{response.metadata.retrieval_ms}ms")
+                with col3:
+                    st.metric("Generation", f"{response.metadata.generation_ms}ms")
+                with col4:
+                    st.metric("Total", f"{response.metadata.latency_ms}ms")
+
+                st.divider()
+
+                # Resposta
+                st.subheader("Resposta")
+                st.markdown(response.answer)
+
+                st.divider()
+
+                # Citacoes
+                st.subheader(f"Citacoes ({len(response.citations)})")
+
+                for i, citation in enumerate(response.citations, 1):
+                    with st.expander(f"[{i}] {citation.text}", expanded=(i <= 2)):
+                        col1, col2 = st.columns(2)
+                        with col1:
+                            st.write(f"**Documento:** {citation.document_type} {citation.document_number}/{citation.year}")
+                            st.write(f"**Artigo:** {citation.article}")
+                        with col2:
+                            if citation.device:
+                                st.write(f"**Dispositivo:** {citation.device}")
+                            if citation.device_number:
+                                st.write(f"**Numero:** {citation.device_number}")
+
+                st.divider()
+
+                # Fontes
+                st.subheader(f"Fontes ({len(response.sources)})")
+
+                sources_data = []
+                for source in response.sources:
+                    sources_data.append({
+                        "Documento": source.get("document_id", ""),
+                        "Tipo": source.get("tipo_documento", ""),
+                        "Numero": source.get("numero", ""),
+                        "Ano": source.get("ano", ""),
+                    })
+
+                if sources_data:
+                    st.dataframe(
+                        pd.DataFrame(sources_data),
+                        hide_index=True,
+                        use_container_width=True,
+                    )
+
+                # JSON completo (debug)
+                with st.expander("Ver resposta JSON completa"):
+                    st.json(response.to_dict())
+
+            except Exception as e:
+                st.error(f"Erro ao gerar resposta: {e}")
                 import traceback
                 st.code(traceback.format_exc())
 
@@ -601,9 +775,12 @@ def page_chunks():
             try:
                 from pymilvus import Collection, connections
 
-                # Garante que a conexão existe
-                if not connections.has_connection("default"):
-                    get_milvus_connection()
+                # Sempre reconecta para garantir conexão válida
+                try:
+                    connections.disconnect("default")
+                except:
+                    pass
+                connections.connect(alias="default", host="localhost", port="19530")
 
                 collection = Collection("leis_v3")
                 collection.load()
@@ -673,6 +850,254 @@ def page_chunks():
 
 
 # =============================================================================
+# PÁGINA: WORKERS (Monitoramento de Enriquecimento)
+# =============================================================================
+
+def get_enrichment_progress():
+    """Obtém progresso do enriquecimento consultando Milvus."""
+    try:
+        from pymilvus import Collection, connections
+
+        # Reconecta
+        try:
+            connections.disconnect("default")
+        except:
+            pass
+        connections.connect(alias="default", host="localhost", port="19530")
+
+        collection = Collection("leis_v3")
+        collection.load()
+
+        # Total de chunks
+        total = collection.num_entities
+
+        # Chunks com context_header preenchido (enriquecidos)
+        enriched_results = collection.query(
+            expr='context_header != ""',
+            output_fields=["chunk_id"],
+            limit=10000,
+        )
+        enriched = len(enriched_results)
+
+        # Chunks sem context_header (pendentes)
+        pending = total - enriched
+
+        # Estatísticas por tipo de documento
+        all_chunks = collection.query(
+            expr="id > 0",
+            output_fields=["document_id", "device_type", "context_header"],
+            limit=10000,
+        )
+
+        by_document = {}
+        for chunk in all_chunks:
+            doc_id = chunk.get("document_id", "Unknown")
+            if doc_id not in by_document:
+                by_document[doc_id] = {"total": 0, "enriched": 0}
+            by_document[doc_id]["total"] += 1
+            if chunk.get("context_header"):
+                by_document[doc_id]["enriched"] += 1
+
+        return {
+            "total": total,
+            "enriched": enriched,
+            "pending": pending,
+            "progress_pct": (enriched / total * 100) if total > 0 else 0,
+            "by_document": by_document,
+        }
+    except Exception as e:
+        return {"error": str(e)}
+
+
+def get_celery_status():
+    """Tenta obter status do Celery via Redis."""
+    try:
+        import redis
+
+        r = redis.Redis(host='localhost', port=6379, db=0)
+        r.ping()
+
+        # Verifica filas do Celery
+        keys = r.keys("celery*")
+        queue_length = r.llen("celery")
+
+        return {
+            "redis_connected": True,
+            "celery_keys": len(keys),
+            "queue_length": queue_length,
+        }
+    except Exception as e:
+        return {
+            "redis_connected": False,
+            "error": str(e),
+        }
+
+
+def page_workers():
+    """Página de monitoramento de workers e enriquecimento."""
+    st.header("Monitoramento de Workers")
+
+    st.markdown("""
+    Esta página mostra o progresso do **enriquecimento de chunks** com LLM.
+
+    O enriquecimento adiciona:
+    - `context_header`: Frase contextualizando o chunk
+    - `thesis_text`: Resumo/tese do dispositivo
+    - `thesis_type`: Classificação (definição, procedimento, etc)
+    - `synthetic_questions`: Perguntas que o chunk responde
+    """)
+
+    st.divider()
+
+    # Botão de atualização
+    col1, col2 = st.columns([1, 5])
+    with col1:
+        refresh = st.button("Atualizar", type="primary", use_container_width=True)
+
+    # Status dos serviços
+    st.subheader("Status dos Serviços")
+
+    col1, col2, col3 = st.columns(3)
+
+    with col1:
+        milvus_ok = get_milvus_connection()
+        if milvus_ok:
+            st.success("Milvus: Conectado")
+        else:
+            st.error("Milvus: Offline")
+
+    with col2:
+        celery_status = get_celery_status()
+        if celery_status.get("redis_connected"):
+            st.success("Redis: Conectado")
+        else:
+            st.error("Redis: Offline")
+
+    with col3:
+        # Verifica vLLM
+        try:
+            import requests
+            resp = requests.get("http://localhost:8000/health", timeout=2)
+            if resp.status_code == 200:
+                st.success("vLLM: Online")
+            else:
+                st.warning("vLLM: Resposta inesperada")
+        except:
+            st.error("vLLM: Offline")
+
+    st.divider()
+
+    # Progresso do enriquecimento
+    st.subheader("Progresso do Enriquecimento")
+
+    progress_data = get_enrichment_progress()
+
+    if "error" in progress_data:
+        st.error(f"Erro ao obter progresso: {progress_data['error']}")
+        return
+
+    # Métricas principais
+    col1, col2, col3, col4 = st.columns(4)
+
+    with col1:
+        st.metric("Total de Chunks", f"{progress_data['total']:,}")
+
+    with col2:
+        st.metric(
+            "Enriquecidos",
+            f"{progress_data['enriched']:,}",
+            delta=f"{progress_data['progress_pct']:.1f}%"
+        )
+
+    with col3:
+        st.metric("Pendentes", f"{progress_data['pending']:,}")
+
+    with col4:
+        # Status
+        if progress_data['pending'] == 0:
+            st.success("COMPLETO")
+        elif progress_data['enriched'] > 0:
+            st.warning("EM PROGRESSO")
+        else:
+            st.info("NÃO INICIADO")
+
+    # Barra de progresso
+    st.progress(progress_data['progress_pct'] / 100)
+    st.caption(
+        f"Progresso: {progress_data['enriched']:,} / {progress_data['total']:,} "
+        f"({progress_data['progress_pct']:.1f}%)"
+    )
+
+    st.divider()
+
+    # Progresso por documento
+    st.subheader("Progresso por Documento")
+
+    if progress_data.get("by_document"):
+        docs_data = []
+        for doc_id, stats in progress_data["by_document"].items():
+            pct = (stats["enriched"] / stats["total"] * 100) if stats["total"] > 0 else 0
+            docs_data.append({
+                "Documento": doc_id,
+                "Total": stats["total"],
+                "Enriquecidos": stats["enriched"],
+                "Pendentes": stats["total"] - stats["enriched"],
+                "Progresso": f"{pct:.1f}%",
+                "Status": "Completo" if pct >= 100 else ("Em progresso" if pct > 0 else "Pendente"),
+            })
+
+        df = pd.DataFrame(docs_data)
+        st.dataframe(df, hide_index=True, use_container_width=True)
+
+        # Gráfico de progresso por documento
+        if len(docs_data) > 0:
+            chart_df = pd.DataFrame(docs_data)
+            chart_df["Progresso_num"] = chart_df["Progresso"].str.replace("%", "").astype(float)
+
+            st.bar_chart(
+                chart_df.set_index("Documento")["Progresso_num"],
+                use_container_width=True,
+            )
+
+    st.divider()
+
+    # Status do Celery/Redis
+    st.subheader("Status do Celery")
+
+    if celery_status.get("redis_connected"):
+        col1, col2 = st.columns(2)
+
+        with col1:
+            st.metric("Chaves Celery no Redis", celery_status.get("celery_keys", 0))
+
+        with col2:
+            st.metric("Tarefas na Fila", celery_status.get("queue_length", 0))
+
+        st.info("""
+        Para iniciar workers Celery:
+        ```bash
+        celery -A enrichment.celery_pipeline worker --loglevel=info --concurrency=2
+        ```
+        """)
+    else:
+        st.warning("Redis não está conectado. O Celery requer Redis para funcionar.")
+        st.info("""
+        Para iniciar o Redis:
+        ```bash
+        docker run -d --name redis -p 6379:6379 redis:alpine
+        ```
+        """)
+
+    # Auto-refresh
+    st.divider()
+    auto_refresh = st.checkbox("Auto-atualizar a cada 30 segundos", value=False)
+    if auto_refresh:
+        import time
+        time.sleep(30)
+        st.rerun()
+
+
+# =============================================================================
 # MAIN
 # =============================================================================
 
@@ -684,20 +1109,24 @@ def main():
     st.sidebar.caption("Dashboard de Métricas")
 
     page = st.sidebar.radio(
-        "Navegação",
-        ["Visão Geral", "Busca", "Ingestão", "Chunks"],
-        index=0,
+        "Navegacao",
+        ["Visao Geral", "Perguntar", "Busca", "Workers", "Ingestao", "Chunks"],
+        index=1,  # Comeca na pagina Perguntar
     )
 
     st.sidebar.divider()
     st.sidebar.caption(f"Atualizado: {datetime.now().strftime('%H:%M:%S')}")
 
-    # Renderiza página selecionada
-    if page == "Visão Geral":
+    # Renderiza pagina selecionada
+    if page == "Visao Geral":
         page_overview()
+    elif page == "Perguntar":
+        page_ask()
     elif page == "Busca":
         page_search()
-    elif page == "Ingestão":
+    elif page == "Workers":
+        page_workers()
+    elif page == "Ingestao":
         page_ingestion()
     elif page == "Chunks":
         page_chunks()

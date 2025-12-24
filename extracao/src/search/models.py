@@ -64,12 +64,18 @@ class SearchHit:
     # Hierarquia
     document_type: str = ""  # LEI, DECRETO, IN
     document_number: str = ""
+    ano: int = 0  # Ano do documento
     chapter_number: str = ""
     chapter_title: str = ""
     tipo_documento: str = ""  # Alias para document_type (compatibilidade Milvus)
 
     # Extras
     metadata: dict[str, Any] = field(default_factory=dict)
+
+    @property
+    def year(self) -> int:
+        """Alias para ano (compatibilidade)."""
+        return self.ano
 
     @property
     def final_score(self) -> float:
@@ -106,6 +112,8 @@ class SearchHit:
             # Hierarquia
             "document_type": self.document_type,
             "document_number": self.document_number,
+            "ano": self.ano,
+            "year": self.year,
             "chapter_number": self.chapter_number,
             "chapter_title": self.chapter_title,
             "tipo_documento": self.tipo_documento,
@@ -155,6 +163,7 @@ class SearchHit:
             # Hierarquia
             document_type=tipo_doc,
             document_number=get_field("numero", ""),
+            ano=get_field("ano", 0),
             chapter_number=get_field("chapter_number", ""),
             chapter_title=get_field("chapter_title", ""),
             tipo_documento=tipo_doc,

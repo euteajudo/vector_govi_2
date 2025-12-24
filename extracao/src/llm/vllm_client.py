@@ -41,7 +41,7 @@ class LLMConfig:
     timeout: float = 120.0  # segundos
 
     # Modelo
-    model: str = "Qwen/Qwen3-8B"  # Modelo padrao
+    model: str = "Qwen/Qwen3-8B-AWQ"  # Modelo padrao (quantizado)
 
     # Geracao
     temperature: float = 0.0
@@ -53,16 +53,17 @@ class LLMConfig:
     retry_delay: float = 1.0
 
     @classmethod
-    def for_enrichment(cls, model: str = "Qwen/Qwen3-4B") -> "LLMConfig":
+    def for_enrichment(cls, model: str = "Qwen/Qwen3-8B-AWQ") -> "LLMConfig":
         """Config otimizada para enriquecimento de chunks."""
         return cls(
             model=model,
             temperature=0.0,
             max_tokens=1024,  # Enriquecimento nao precisa de muito
+            timeout=300.0,  # 5 minutos para batches grandes
         )
 
     @classmethod
-    def for_extraction(cls, model: str = "Qwen/Qwen3-8B") -> "LLMConfig":
+    def for_extraction(cls, model: str = "Qwen/Qwen3-8B-AWQ") -> "LLMConfig":
         """Config para extracao estruturada (JSON complexo)."""
         return cls(
             model=model,

@@ -1,51 +1,51 @@
 {
-  "ingestion_id": "LEI-14133-2021-1766509184",
-  "timestamp": "2025-12-23T16:59:44.032618",
+  "ingestion_id": "LEI-14133-2021-1766524667",
+  "timestamp": "2025-12-23T21:17:47.246233",
   "status": "completed",
   "error": null,
-  "total_duration_seconds": 518.04,
+  "total_duration_seconds": 619.84,
   "phases": [
     {
       "name": "load",
       "duration_seconds": 0.0,
       "items_processed": 1,
       "errors": 0,
-      "items_per_second": 500.096
+      "items_per_second": 396.962
     },
     {
       "name": "parsing",
       "duration_seconds": 0.03,
       "items_processed": 1354,
       "errors": 0,
-      "items_per_second": 54051.544
+      "items_per_second": 52036.795
     },
     {
       "name": "extraction",
-      "duration_seconds": 261.1,
+      "duration_seconds": 358.48,
       "items_processed": 204,
       "errors": 0,
-      "items_per_second": 0.781
+      "items_per_second": 0.569
     },
     {
       "name": "materialization",
       "duration_seconds": 0.02,
       "items_processed": 1265,
       "errors": 0,
-      "items_per_second": 59931.488
+      "items_per_second": 58942.139
     },
     {
       "name": "embedding",
-      "duration_seconds": 254.41,
+      "duration_seconds": 258.89,
       "items_processed": 1265,
       "errors": 0,
-      "items_per_second": 4.972
+      "items_per_second": 4.886
     },
     {
       "name": "indexing",
-      "duration_seconds": 2.48,
+      "duration_seconds": 2.42,
       "items_processed": 1265,
       "errors": 0,
-      "items_per_second": 510.156
+      "items_per_second": 523.258
     }
   ],
   "document": {

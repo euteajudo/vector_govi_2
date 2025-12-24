@@ -1,63 +1,63 @@
 {
-  "ingestion_id": "IN-65-2021-1766511316",
-  "timestamp": "2025-12-23T17:35:16.290359",
+  "ingestion_id": "IN-65-2021-1766518403",
+  "timestamp": "2025-12-23T19:33:23.394228",
   "status": "completed",
   "error": null,
-  "total_duration_seconds": 279.67,
+  "total_duration_seconds": 313.46,
   "phases": [
     {
       "name": "load",
       "duration_seconds": 0.0,
       "items_processed": 1,
       "errors": 0,
-      "items_per_second": 2001.099
+      "items_per_second": 911.409
     },
     {
       "name": "parsing",
       "duration_seconds": 0.0,
       "items_processed": 57,
       "errors": 0,
-      "items_per_second": 28502.066
+      "items_per_second": 37774.582
     },
     {
       "name": "extraction",
-      "duration_seconds": 11.49,
+      "duration_seconds": 12.08,
       "items_processed": 11,
       "errors": 0,
-      "items_per_second": 0.957
+      "items_per_second": 0.911
     },
     {
       "name": "materialization",
       "duration_seconds": 0.0,
       "items_processed": 47,
       "errors": 0,
-      "items_per_second": 0.0
+      "items_per_second": 92811.812
     },
     {
       "name": "enrichment",
-      "duration_seconds": 233.05,
+      "duration_seconds": 266.29,
       "items_processed": 47,
       "errors": 0,
-      "items_per_second": 0.202
+      "items_per_second": 0.177
     },
     {
       "name": "embedding",
-      "duration_seconds": 33.37,
+      "duration_seconds": 33.41,
       "items_processed": 47,
       "errors": 0,
-      "items_per_second": 1.409
+      "items_per_second": 1.407
     },
     {
       "name": "indexing",
-      "duration_seconds": 1.76,
+      "duration_seconds": 1.68,
       "items_processed": 47,
       "errors": 0,
-      "items_per_second": 26.751
+      "items_per_second": 27.917
     }
   ],
   "document": {
     "document_id": "IN-65-2021",
-    "tipo_documento": "INSTRUCAO NORMATIVA",
+    "tipo_documento": "IN",
     "numero": "65",
     "ano": 2021,
     "articles": {
