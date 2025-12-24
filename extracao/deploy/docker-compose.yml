@@ -1,0 +1,235 @@
+# =============================================================================
+# Docker Compose - Pipeline RAG para Documentos Legais
+# =============================================================================
+# Uso: docker-compose up -d
+# =============================================================================
+
+version: '3.8'
+
+services:
+  # ---------------------------------------------------------------------------
+  # vLLM - Servidor de LLM (Qwen 3 8B-AWQ)
+  # ---------------------------------------------------------------------------
+  vllm:
+    image: vllm/vllm-openai:latest
+    container_name: vllm
+    runtime: nvidia
+    ports:
+      - "8000:8000"
+    volumes:
+      - huggingface-cache:/root/.cache/huggingface
+    environment:
+      - HUGGING_FACE_HUB_TOKEN=${HF_TOKEN:-}
+    command: >
+      --model Qwen/Qwen3-8B-AWQ
+      --max-model-len 16000
+      --gpu-memory-utilization 0.85
+      --dtype auto
+      --trust-remote-code
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 120s
+    restart: unless-stopped
+
+  # ---------------------------------------------------------------------------
+  # Milvus - Vector Database
+  # ---------------------------------------------------------------------------
+  etcd:
+    image: quay.io/coreos/etcd:v3.5.5
+    container_name: milvus-etcd
+    environment:
+      - ETCD_AUTO_COMPACTION_MODE=revision
+      - ETCD_AUTO_COMPACTION_RETENTION=1000
+      - ETCD_QUOTA_BACKEND_BYTES=4294967296
+      - ETCD_SNAPSHOT_COUNT=50000
+    volumes:
+      - etcd-data:/etcd
+    command: etcd -advertise-client-urls=http://127.0.0.1:2379 -listen-client-urls http://0.0.0.0:2379 --data-dir /etcd
+    healthcheck:
+      test: ["CMD", "etcdctl", "endpoint", "health"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+    restart: unless-stopped
+
+  minio:
+    image: minio/minio:RELEASE.2023-03-20T20-16-18Z
+    container_name: milvus-minio
+    environment:
+      MINIO_ACCESS_KEY: minioadmin
+      MINIO_SECRET_KEY: minioadmin
+    ports:
+      - "9001:9001"
+      - "9000:9000"
+    volumes:
+      - minio-data:/minio_data
+    command: minio server /minio_data --console-address ":9001"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+    restart: unless-stopped
+
+  milvus-standalone:
+    image: milvusdb/milvus:v2.4-latest
+    container_name: milvus-standalone
+    command: ["milvus", "run", "standalone"]
+    security_opt:
+      - seccomp:unconfined
+    environment:
+      ETCD_ENDPOINTS: etcd:2379
+      MINIO_ADDRESS: minio:9000
+    volumes:
+      - milvus-data:/var/lib/milvus
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9091/healthz"]
+      interval: 30s
+      start_period: 90s
+      timeout: 20s
+      retries: 3
+    ports:
+      - "19530:19530"
+      - "9091:9091"
+    depends_on:
+      - etcd
+      - minio
+    restart: unless-stopped
+
+  # ---------------------------------------------------------------------------
+  # Redis - Message Broker para Celery
+  # ---------------------------------------------------------------------------
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  # ---------------------------------------------------------------------------
+  # RAG Pipeline - Aplicação Principal
+  # ---------------------------------------------------------------------------
+  rag-app:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile
+    container_name: rag-app
+    runtime: nvidia
+    ports:
+      - "8501:8501"   # Streamlit
+      - "8080:8080"   # FastAPI (futuro)
+    volumes:
+      - ../src:/app/src:ro
+      - ../scripts:/app/scripts:ro
+      - ../data:/app/data
+      - huggingface-cache:/app/.cache/huggingface
+    environment:
+      - VLLM_HOST=vllm
+      - VLLM_PORT=8000
+      - MILVUS_HOST=milvus-standalone
+      - MILVUS_PORT=19530
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - HF_HOME=/app/.cache/huggingface
+    depends_on:
+      vllm:
+        condition: service_healthy
+      milvus-standalone:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    restart: unless-stopped
+
+  # ---------------------------------------------------------------------------
+  # Celery Worker - Processamento em Background
+  # ---------------------------------------------------------------------------
+  celery-worker:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile
+    container_name: celery-worker
+    runtime: nvidia
+    command: celery -A src.enrichment.celery_app worker --loglevel=info --concurrency=1
+    volumes:
+      - ../src:/app/src:ro
+      - huggingface-cache:/app/.cache/huggingface
+    environment:
+      - VLLM_HOST=vllm
+      - VLLM_PORT=8000
+      - MILVUS_HOST=milvus-standalone
+      - MILVUS_PORT=19530
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - HF_HOME=/app/.cache/huggingface
+    depends_on:
+      vllm:
+        condition: service_healthy
+      milvus-standalone:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    restart: unless-stopped
+
+  # ---------------------------------------------------------------------------
+  # Flower - Monitor Celery
+  # ---------------------------------------------------------------------------
+  flower:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile
+    container_name: flower
+    command: celery -A src.enrichment.celery_app flower --port=5555
+    ports:
+      - "5555:5555"
+    volumes:
+      - ../src:/app/src:ro
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    depends_on:
+      - redis
+    restart: unless-stopped
+
+volumes:
+  huggingface-cache:
+    driver: local
+  milvus-data:
+    driver: local
+  etcd-data:
+    driver: local
+  minio-data:
+    driver: local
+  redis-data:
+    driver: local

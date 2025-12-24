@@ -35,7 +35,23 @@
       "Bash(findstr:*)",
       "Bash(.venvScriptsstreamlit.exe run src/dashboard/app.py --server.port 8501)",
       "Bash(D:/2025/pipeline/extracao/.venv/Scripts/streamlit.exe run:*)",
-      "Bash(tasklist:*)"
+      "Bash(tasklist:*)",
+      "Bash(docker start:*)",
+      "Bash(ping:*)",
+      "Bash(D:/2025/pipeline/extracao/.venv/Scripts/celery.exe:*)",
+      "Bash(nvidia-smi:*)",
+      "Bash(D:2025pipelineextracao.venvScriptspython.exe scripts/test_answer_generator.py --fast --query \"Quando o ETP pode ser dispensado?\")",
+      "Bash(taskkill:*)",
+      "Bash(netstat:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(D:/2025/pipeline/extracao/.venv/Scripts/pip.exe freeze:*)",
+      "Bash(cat:*)",
+      "Bash(ssh-keygen:*)",
+      "Bash(powershell -Command \"Compress-Archive -Path ''src'', ''scripts'', ''deploy'', ''pyproject.toml'' -DestinationPath ''rag-pipeline.zip'' -Force\")",
+      "Bash(ssh:*)",
+      "Bash(scp:*)"
     ]
   }
 }
