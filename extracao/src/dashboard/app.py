@@ -63,6 +63,13 @@ def init_models():
 # CONEXÕES E CACHE
 # =============================================================================
 
+# Configuração do ambiente (VPS = produção)
+import os
+MILVUS_HOST = os.getenv("MILVUS_HOST", "77.37.43.160")  # VPS por padrão
+MILVUS_PORT = os.getenv("MILVUS_PORT", "19530")
+GPU_SERVER_URL = os.getenv("GPU_SERVER_URL", "http://195.26.233.70:55278")
+
+
 @st.cache_resource
 def get_milvus_connection():
     """Conecta ao Milvus (cached)."""
@@ -71,12 +78,12 @@ def get_milvus_connection():
 
         connections.connect(
             alias="default",
-            host="localhost",
-            port="19530",
+            host=MILVUS_HOST,
+            port=MILVUS_PORT,
         )
         return True
     except Exception as e:
-        st.error(f"Erro ao conectar ao Milvus: {e}")
+        st.error(f"Erro ao conectar ao Milvus ({MILVUS_HOST}:{MILVUS_PORT}): {e}")
         return False
 
 
@@ -113,7 +120,7 @@ def get_collection_stats():
             connections.disconnect("default")
         except:
             pass
-        connections.connect(alias="default", host="localhost", port="19530")
+        connections.connect(alias="default", host=MILVUS_HOST, port=MILVUS_PORT)
 
         collection = Collection("leis_v3")
         collection.load()
@@ -856,7 +863,7 @@ def page_chunks():
                     connections.disconnect("default")
                 except:
                     pass
-                connections.connect(alias="default", host="localhost", port="19530")
+                connections.connect(alias="default", host=MILVUS_HOST, port=MILVUS_PORT)
 
                 collection = Collection("leis_v3")
                 collection.load()
@@ -939,7 +946,7 @@ def get_enrichment_progress():
             connections.disconnect("default")
         except:
             pass
-        connections.connect(alias="default", host="localhost", port="19530")
+        connections.connect(alias="default", host=MILVUS_HOST, port=MILVUS_PORT)
 
         collection = Collection("leis_v3")
         collection.load()
@@ -989,18 +996,44 @@ def get_celery_status():
     """Tenta obter status do Celery via Redis."""
     try:
         import redis
+        import json
 
-        r = redis.Redis(host='localhost', port=6379, db=0)
+        r = redis.Redis(host='localhost', port=6379, db=0, decode_responses=True)
         r.ping()
 
         # Verifica filas do Celery
         keys = r.keys("celery*")
         queue_length = r.llen("celery")
 
+        # Busca tasks recentes nos resultados
+        task_results = []
+        result_keys = r.keys("celery-task-meta-*")
+        for key in result_keys[:20]:  # Últimas 20 tasks
+            try:
+                data = r.get(key)
+                if data:
+                    task_data = json.loads(data)
+                    task_results.append({
+                        "task_id": key.replace("celery-task-meta-", ""),
+                        "status": task_data.get("status", "UNKNOWN"),
+                        "result": str(task_data.get("result", ""))[:100],
+                    })
+            except:
+                pass
+
+        # Conta por status
+        status_counts = {}
+        for task in task_results:
+            status = task["status"]
+            status_counts[status] = status_counts.get(status, 0) + 1
+
         return {
             "redis_connected": True,
             "celery_keys": len(keys),
             "queue_length": queue_length,
+            "result_keys": len(result_keys),
+            "recent_tasks": task_results,
+            "status_counts": status_counts,
         }
     except Exception as e:
         return {
@@ -1021,26 +1054,32 @@ def page_workers():
     - `thesis_text`: Resumo/tese do dispositivo
     - `thesis_type`: Classificação (definição, procedimento, etc)
     - `synthetic_questions`: Perguntas que o chunk responde
+
+    **Arquitetura:**
+    - **VPS** (77.37.43.160): Milvus + Celery Workers
+    - **POD** (GPU Server): vLLM (qwen3-8b) + BGE-M3 embeddings
     """)
 
     st.divider()
 
-    # Botão de atualização
-    col1, col2 = st.columns([1, 5])
+    # Botão de atualização e link para Flower
+    col1, col2, col3 = st.columns([1, 1, 4])
     with col1:
         refresh = st.button("Atualizar", type="primary", use_container_width=True)
+    with col2:
+        st.link_button("Flower UI", "http://localhost:5555", use_container_width=True)
 
     # Status dos serviços
     st.subheader("Status dos Serviços")
 
-    col1, col2, col3 = st.columns(3)
+    col1, col2, col3, col4 = st.columns(4)
 
     with col1:
         milvus_ok = get_milvus_connection()
         if milvus_ok:
-            st.success("Milvus: Conectado")
+            st.success(f"Milvus: Conectado\n({MILVUS_HOST})")
         else:
-            st.error("Milvus: Offline")
+            st.error(f"Milvus: Offline\n({MILVUS_HOST})")
 
     with col2:
         celery_status = get_celery_status()
@@ -1050,16 +1089,30 @@ def page_workers():
             st.error("Redis: Offline")
 
     with col3:
-        # Verifica vLLM
+        # Verifica GPU Server (POD)
         try:
             import requests
-            resp = requests.get("http://localhost:8000/health", timeout=2)
+            resp = requests.get(f"{GPU_SERVER_URL}/health", timeout=5)
             if resp.status_code == 200:
-                st.success("vLLM: Online")
+                st.success(f"GPU Server: Online")
             else:
-                st.warning("vLLM: Resposta inesperada")
+                st.warning("GPU Server: Resposta inesperada")
         except:
-            st.error("vLLM: Offline")
+            st.error("GPU Server: Offline")
+
+    with col4:
+        # Verifica vLLM no GPU Server
+        try:
+            import requests
+            resp = requests.get(f"{GPU_SERVER_URL}/v1/models", timeout=5)
+            if resp.status_code == 200:
+                models = resp.json().get("data", [])
+                model_name = models[0]["id"] if models else "N/A"
+                st.success(f"LLM: {model_name}")
+            else:
+                st.warning("LLM: Status desconhecido")
+        except Exception as e:
+            st.error(f"LLM: Offline")
 
     st.divider()
 
@@ -1141,7 +1194,7 @@ def page_workers():
     st.subheader("Status do Celery")
 
     if celery_status.get("redis_connected"):
-        col1, col2 = st.columns(2)
+        col1, col2, col3, col4 = st.columns(4)
 
         with col1:
             st.metric("Chaves Celery no Redis", celery_status.get("celery_keys", 0))
@@ -1149,27 +1202,96 @@ def page_workers():
         with col2:
             st.metric("Tarefas na Fila", celery_status.get("queue_length", 0))
 
-        st.info("""
-        Para iniciar workers Celery:
-        ```bash
-        celery -A enrichment.celery_pipeline worker --loglevel=info --concurrency=2
-        ```
-        """)
+        with col3:
+            st.metric("Resultados Armazenados", celery_status.get("result_keys", 0))
+
+        with col4:
+            status_counts = celery_status.get("status_counts", {})
+            success_count = status_counts.get("SUCCESS", 0)
+            failure_count = status_counts.get("FAILURE", 0)
+            st.metric("Sucesso / Falha", f"{success_count} / {failure_count}")
+
+        # Status das tasks recentes
+        if celery_status.get("status_counts"):
+            st.write("**Status das Tasks Recentes:**")
+            status_df = pd.DataFrame([
+                {"Status": k, "Quantidade": v}
+                for k, v in celery_status["status_counts"].items()
+            ])
+            st.dataframe(status_df, hide_index=True, use_container_width=True)
+
+        st.divider()
+
+        # Comandos para rodar na VPS
+        st.subheader("Comandos para VPS")
+
+        with st.expander("Iniciar Workers Celery na VPS", expanded=True):
+            st.code("""# SSH para VPS
+ssh root@77.37.43.160
+
+# Navegar para o projeto
+cd /root/vector_govi_2/extracao
+
+# Ativar ambiente virtual
+source venv/bin/activate
+
+# Iniciar workers (4 workers recomendado)
+celery -A src.enrichment.celery_app worker --loglevel=info --concurrency=4
+
+# OU rodar em background com nohup
+nohup celery -A src.enrichment.celery_app worker --loglevel=info --concurrency=4 > celery.log 2>&1 &
+""", language="bash")
+
+        with st.expander("Iniciar Flower (Interface Web)"):
+            st.code("""# Na VPS (mesmo ambiente do Celery)
+pip install flower
+
+# Iniciar Flower na porta 5555
+celery -A src.enrichment.celery_app flower --port=5555
+
+# OU em background
+nohup celery -A src.enrichment.celery_app flower --port=5555 > flower.log 2>&1 &
+
+# Acessar: http://77.37.43.160:5555
+""", language="bash")
+
+        with st.expander("Disparar Enriquecimento"):
+            st.code("""# Na VPS
+cd /root/vector_govi_2/extracao
+source venv/bin/activate
+
+# Rodar script de enriquecimento HTTP (sem Celery)
+python scripts/pod/enrich_http.py --document-id IN-65-2021
+
+# OU via Celery tasks
+python -c "from src.enrichment.tasks_http import enrich_all_chunks_http; enrich_all_chunks_http.delay()"
+""", language="bash")
+
     else:
         st.warning("Redis não está conectado. O Celery requer Redis para funcionar.")
-        st.info("""
-        Para iniciar o Redis:
-        ```bash
-        docker run -d --name redis -p 6379:6379 redis:alpine
-        ```
-        """)
+
+        with st.expander("Iniciar Redis na VPS"):
+            st.code("""# SSH para VPS
+ssh root@77.37.43.160
+
+# Instalar Redis via Docker
+docker run -d --name redis -p 6379:6379 redis:alpine
+
+# Verificar se está rodando
+docker ps | grep redis
+""", language="bash")
 
     # Auto-refresh
     st.divider()
-    auto_refresh = st.checkbox("Auto-atualizar a cada 30 segundos", value=False)
+    col1, col2 = st.columns([1, 5])
+    with col1:
+        auto_refresh = st.checkbox("Auto-atualizar", value=False)
+    with col2:
+        refresh_interval = st.slider("Intervalo (segundos)", 10, 120, 30, disabled=not auto_refresh)
+
     if auto_refresh:
         import time
-        time.sleep(30)
+        time.sleep(refresh_interval)
         st.rerun()
 
 

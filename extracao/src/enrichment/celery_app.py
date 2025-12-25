@@ -4,22 +4,31 @@ Configuracao do Celery para enriquecimento paralelo.
 Requer Redis rodando:
     docker run -d --name redis -p 6379:6379 redis:alpine
 
-Iniciar worker:
-    cd extracao
-    celery -A src.enrichment.celery_app worker --loglevel=info --concurrency=2
+Iniciar worker na VPS:
+    cd /root/vector_govi_2/extracao
+    source venv/bin/activate
+    celery -A src.enrichment.celery_app worker --loglevel=info --concurrency=4
 
 Monitorar:
-    celery -A src.enrichment.celery_app flower  # (requer: pip install flower)
+    celery -A src.enrichment.celery_app flower --port=5555
+
+Acessar Flower:
+    http://77.37.43.160:5555
 """
 
+import os
 from celery import Celery
+
+# Configuracao do ambiente
+REDIS_HOST = os.getenv("REDIS_HOST", "localhost")
+REDIS_PORT = os.getenv("REDIS_PORT", "6379")
 
 # Configuracao do Celery com Redis
 app = Celery(
     "enrichment",
-    broker="redis://localhost:6379/0",
-    backend="redis://localhost:6379/0",
-    include=["src.enrichment.tasks"],
+    broker=f"redis://{REDIS_HOST}:{REDIS_PORT}/0",
+    backend=f"redis://{REDIS_HOST}:{REDIS_PORT}/0",
+    include=["src.enrichment.tasks", "src.enrichment.tasks_http"],
 )
 
 # Configuracoes
