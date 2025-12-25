@@ -68,26 +68,38 @@ class HybridSearcher:
 
     @property
     def embedder(self):
-        """Carrega embedder sob demanda."""
+        """Carrega embedder sob demanda.
+        
+        Em modo production (RAG_MODE=production): usa singleton do model_pool.
+        Em modo development (padrao): cria nova instancia local.
+        """
         if self._embedder is None:
-            from embeddings import BGEM3Embedder, EmbeddingConfig
-
-            logger.info("Carregando BGE-M3 embedder...")
-            self._embedder = BGEM3Embedder(
-                EmbeddingConfig(use_fp16=self.config.use_fp16)
-            )
+            from model_pool import get_embedder
+            self._embedder = get_embedder()
+            if self._embedder is None:
+                logger.info("Carregando BGE-M3 embedder (modo development)...")
+                from embeddings import BGEM3Embedder, EmbeddingConfig
+                self._embedder = BGEM3Embedder(EmbeddingConfig(use_fp16=True))
+            else:
+                logger.info("Usando BGE-M3 embedder (singleton - modo production)")
         return self._embedder
 
     @property
     def reranker(self):
-        """Carrega reranker sob demanda."""
+        """Carrega reranker sob demanda.
+        
+        Em modo production (RAG_MODE=production): usa singleton do model_pool.
+        Em modo development (padrao): cria nova instancia local.
+        """
         if self._reranker is None and self.config.rerank_mode == RerankMode.CROSS_ENCODER:
-            from embeddings import BGEReranker, RerankerConfig
-
-            logger.info("Carregando BGE-Reranker...")
-            self._reranker = BGEReranker(
-                RerankerConfig(use_fp16=self.config.use_fp16)
-            )
+            from model_pool import get_reranker
+            self._reranker = get_reranker()
+            if self._reranker is None:
+                logger.info("Carregando BGE-Reranker (modo development)...")
+                from embeddings import BGEReranker, RerankerConfig
+                self._reranker = BGEReranker(RerankerConfig(use_fp16=True))
+            else:
+                logger.info("Usando BGE-Reranker (singleton - modo production)")
         return self._reranker
 
     @property

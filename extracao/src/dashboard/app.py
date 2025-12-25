@@ -35,6 +35,30 @@ st.set_page_config(
 
 
 # =============================================================================
+# WARMUP DE MODELOS (carrega uma vez, fica em memória)
+# =============================================================================
+
+@st.cache_resource
+def init_models():
+    """
+    Carrega BGE-M3 e Reranker na GPU uma única vez.
+
+    Usa @st.cache_resource para manter em memória enquanto o app roda.
+    Isso evita recarregar os modelos a cada query (economia de ~15-20s).
+    """
+    import time
+    start = time.time()
+
+    try:
+        from model_pool import preload_models
+        preload_models()
+        load_time = time.time() - start
+        return {"status": "ok", "load_time": load_time}
+    except Exception as e:
+        return {"status": "error", "error": str(e)}
+
+
+# =============================================================================
 # CONEXÕES E CACHE
 # =============================================================================
 
@@ -1107,6 +1131,18 @@ def main():
     # Sidebar - Navegação
     st.sidebar.title("Pipeline RAG")
     st.sidebar.caption("Dashboard de Métricas")
+
+    # Warmup dos modelos (executa apenas uma vez)
+    with st.sidebar:
+        with st.spinner("Carregando modelos..."):
+            models_status = init_models()
+
+        if models_status["status"] == "ok":
+            st.success(f"Modelos prontos ({models_status['load_time']:.1f}s)")
+        else:
+            st.error(f"Erro: {models_status.get('error', 'Desconhecido')}")
+
+        st.divider()
 
     page = st.sidebar.radio(
         "Navegacao",

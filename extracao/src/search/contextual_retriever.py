@@ -136,10 +136,19 @@ class ContextualRetriever:
             self._connected = True
 
     def _ensure_embedder(self):
-        """Carrega embedder se necessário."""
+        """Carrega embedder se necessário.
+        
+        Em modo production (RAG_MODE=production): usa singleton do model_pool.
+        Em modo development (padrao): cria nova instancia local.
+        """
         if self._embedder is None:
-            from FlagEmbedding import BGEM3FlagModel
-            self._embedder = BGEM3FlagModel('BAAI/bge-m3', use_fp16=True)
+            from model_pool import get_raw_embedder
+            self._embedder = get_raw_embedder()
+            
+            # Se retornou None (modo development), cria instancia local
+            if self._embedder is None:
+                from FlagEmbedding import BGEM3FlagModel
+                self._embedder = BGEM3FlagModel("BAAI/bge-m3", use_fp16=True)
 
     def detect_strategy(self, query: str) -> RetrievalStrategy:
         """
