@@ -35,6 +35,20 @@ st.set_page_config(
 
 
 # =============================================================================
+# DETECÇÃO DE MODO (development vs production)
+# =============================================================================
+
+import os
+
+RAG_MODE = os.getenv("RAG_MODE", "development").lower()
+
+
+def is_production_mode() -> bool:
+    """Verifica se está em modo produção."""
+    return RAG_MODE == "production"
+
+
+# =============================================================================
 # WARMUP DE MODELOS (carrega uma vez, fica em memória)
 # =============================================================================
 
@@ -43,19 +57,47 @@ def init_models():
     """
     Carrega BGE-M3 e Reranker na GPU uma única vez.
 
-    Usa @st.cache_resource para manter em memória enquanto o app roda.
-    Isso evita recarregar os modelos a cada query (economia de ~15-20s).
+    Comportamento por modo:
+    - **production**: Pré-carrega modelos na GPU (singleton pattern)
+    - **development**: Não pré-carrega, modelos carregados sob demanda
+
+    Em modo production, usa @st.cache_resource para manter em memória
+    enquanto o app roda. Isso evita recarregar os modelos a cada query
+    (economia de ~15-20s).
+
+    Em modo development, retorna imediatamente sem carregar modelos,
+    pois GPUs menores (12GB) não têm VRAM suficiente para manter
+    vLLM + BGE-M3 + Reranker simultaneamente.
     """
     import time
     start = time.time()
 
+    if not is_production_mode():
+        # Modo development: não pré-carrega modelos
+        return {
+            "status": "ok",
+            "mode": "development",
+            "load_time": 0.0,
+            "message": "Modelos serão carregados sob demanda (lazy loading)",
+        }
+
+    # Modo production: pré-carrega modelos na GPU
     try:
         from model_pool import preload_models
         preload_models()
         load_time = time.time() - start
-        return {"status": "ok", "load_time": load_time}
+        return {
+            "status": "ok",
+            "mode": "production",
+            "load_time": load_time,
+            "message": "Modelos carregados na GPU (singleton pattern)",
+        }
     except Exception as e:
-        return {"status": "error", "error": str(e)}
+        return {
+            "status": "error",
+            "mode": "production",
+            "error": str(e),
+        }
 
 
 # =============================================================================
@@ -1134,11 +1176,30 @@ def main():
 
     # Warmup dos modelos (executa apenas uma vez)
     with st.sidebar:
-        with st.spinner("Carregando modelos..."):
+        # Mostra modo atual
+        mode_label = "PRODUCTION" if is_production_mode() else "DEVELOPMENT"
+        mode_color = "green" if is_production_mode() else "blue"
+        st.markdown(f"**Modo:** :{mode_color}[{mode_label}]")
+
+        with st.spinner("Inicializando..."):
             models_status = init_models()
 
         if models_status["status"] == "ok":
-            st.success(f"Modelos prontos ({models_status['load_time']:.1f}s)")
+            mode = models_status.get("mode", "unknown")
+            load_time = models_status.get("load_time", 0.0)
+
+            if mode == "production":
+                st.success(f"Modelos na GPU ({load_time:.1f}s)")
+            else:
+                st.info("Modelos sob demanda (lazy loading)")
+
+            # Tooltip com detalhes
+            with st.expander("Detalhes do modo", expanded=False):
+                st.write(models_status.get("message", ""))
+                if mode == "development":
+                    st.caption("Para produção: export RAG_MODE=production")
+                else:
+                    st.caption("Para desenvolvimento: export RAG_MODE=development")
         else:
             st.error(f"Erro: {models_status.get('error', 'Desconhecido')}")
 

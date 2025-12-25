@@ -927,6 +927,39 @@ Custo estimado (API ref): $0.0066
 | `PhaseMetrics` | Métricas de uma fase do pipeline |
 | `IngestionMetrics` | Relatório completo de ingestão |
 
+
+
+### 12.1 Dashboard Streamlit - Modos Dev/Prod (25/12/2024)
+
+O dashboard Streamlit suporta dois modos de operacao baseado na variavel RAG_MODE:
+
+**Modos de Operacao**:
+
+| Modo | RAG_MODE | GPU | Comportamento |
+|------|----------|-----|---------------|
+| **Development** | development (padrao) | 12GB | Lazy loading, modelos sob demanda |
+| **Production** | production | 24GB+ | Singleton, modelos na GPU permanentemente |
+
+**Como Alternar**:
+
+- Desenvolvimento: export RAG_MODE=development
+- Producao: export RAG_MODE=production
+
+**Comportamento em cada modo**:
+
+| Aspecto | Development | Production |
+|---------|-------------|------------|
+| Startup | Imediato (~0s) | Lento (~15-20s) |
+| Primeira query | Lenta (~30-40s) | Rapida (~10s) |
+| VRAM usada | Libera apos uso | Permanente (~8GB) |
+| st.cache_resource | Nao pre-carrega | Pre-carrega BGE-M3 + Reranker |
+
+**Indicador Visual na Sidebar**:
+
+O dashboard mostra o modo atual na sidebar:
+- **DEVELOPMENT** (azul): Modelos sob demanda
+- **PRODUCTION** (verde): Modelos na GPU
+
 ### 13. Modulo de Busca Hibrida (22/12/2024)
 
 Modulo reutilizavel para busca 2-stage com BGE-M3 + BGE-Reranker.
