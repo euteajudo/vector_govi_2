@@ -22,6 +22,7 @@ if str(src_path) not in sys.path:
 import streamlit as st
 import pandas as pd
 import json
+import hashlib
 from datetime import datetime
 from typing import Optional
 
@@ -35,20 +36,6 @@ st.set_page_config(
 
 
 # =============================================================================
-# DETECÇÃO DE MODO (development vs production)
-# =============================================================================
-
-import os
-
-RAG_MODE = os.getenv("RAG_MODE", "development").lower()
-
-
-def is_production_mode() -> bool:
-    """Verifica se está em modo produção."""
-    return RAG_MODE == "production"
-
-
-# =============================================================================
 # WARMUP DE MODELOS (carrega uma vez, fica em memória)
 # =============================================================================
 
@@ -57,47 +44,19 @@ def init_models():
     """
     Carrega BGE-M3 e Reranker na GPU uma única vez.
 
-    Comportamento por modo:
-    - **production**: Pré-carrega modelos na GPU (singleton pattern)
-    - **development**: Não pré-carrega, modelos carregados sob demanda
-
-    Em modo production, usa @st.cache_resource para manter em memória
-    enquanto o app roda. Isso evita recarregar os modelos a cada query
-    (economia de ~15-20s).
-
-    Em modo development, retorna imediatamente sem carregar modelos,
-    pois GPUs menores (12GB) não têm VRAM suficiente para manter
-    vLLM + BGE-M3 + Reranker simultaneamente.
+    Usa @st.cache_resource para manter em memória enquanto o app roda.
+    Isso evita recarregar os modelos a cada query (economia de ~15-20s).
     """
     import time
     start = time.time()
 
-    if not is_production_mode():
-        # Modo development: não pré-carrega modelos
-        return {
-            "status": "ok",
-            "mode": "development",
-            "load_time": 0.0,
-            "message": "Modelos serão carregados sob demanda (lazy loading)",
-        }
-
-    # Modo production: pré-carrega modelos na GPU
     try:
         from model_pool import preload_models
         preload_models()
         load_time = time.time() - start
-        return {
-            "status": "ok",
-            "mode": "production",
-            "load_time": load_time,
-            "message": "Modelos carregados na GPU (singleton pattern)",
-        }
+        return {"status": "ok", "load_time": load_time}
     except Exception as e:
-        return {
-            "status": "error",
-            "mode": "production",
-            "error": str(e),
-        }
+        return {"status": "error", "error": str(e)}
 
 
 # =============================================================================
@@ -536,6 +495,15 @@ def page_ask():
 
                 st.divider()
 
+                # Indicador de cache
+                if response.metadata.from_cache:
+                    score = response.metadata.cache_similarity
+                    # RRF score é pequeno (0.01-0.03), mostra diretamente
+                    if score < 0.1:
+                        st.success(f"⚡ Resposta do CACHE HÍBRIDO (RRF score: {score:.4f})")
+                    else:
+                        st.success(f"⚡ Resposta do CACHE (similaridade: {score:.1%})")
+
                 # Metricas
                 col1, col2, col3, col4 = st.columns(4)
 
@@ -553,6 +521,48 @@ def page_ask():
                 # Resposta
                 st.subheader("Resposta")
                 st.markdown(response.answer)
+
+                # Botões de feedback (like/dislike)
+                st.divider()
+                st.write("**Esta resposta foi útil?**")
+
+                # Calcula hash da query para feedback
+                query_hash = hashlib.sha256(query.strip().lower().encode()).hexdigest()[:32]
+
+                # Armazena na sessão para evitar votos duplicados
+                feedback_key = f"feedback_{query_hash}"
+
+                col1, col2, col3 = st.columns([1, 1, 4])
+
+                with col1:
+                    if st.button("👍 Sim", key=f"like_{query_hash}", use_container_width=True):
+                        if not st.session_state.get(feedback_key):
+                            try:
+                                cache = get_cache_connection()
+                                if cache:
+                                    cache.record_feedback(query_hash, is_like=True)
+                                    cache.close()
+                                st.session_state[feedback_key] = "like"
+                                st.success("Obrigado pelo feedback! 👍")
+                            except Exception as e:
+                                st.warning("Não foi possível registrar o feedback.")
+                        else:
+                            st.info("Você já votou nesta resposta.")
+
+                with col2:
+                    if st.button("👎 Não", key=f"dislike_{query_hash}", use_container_width=True):
+                        if not st.session_state.get(feedback_key):
+                            try:
+                                cache = get_cache_connection()
+                                if cache:
+                                    cache.record_feedback(query_hash, is_like=False)
+                                    cache.close()
+                                st.session_state[feedback_key] = "dislike"
+                                st.warning("Obrigado! Vamos melhorar. 👎")
+                            except Exception as e:
+                                st.warning("Não foi possível registrar o feedback.")
+                        else:
+                            st.info("Você já votou nesta resposta.")
 
                 st.divider()
 
@@ -1164,6 +1174,210 @@ def page_workers():
 
 
 # =============================================================================
+# PÁGINA: CACHE SEMÂNTICO
+# =============================================================================
+
+def get_cache_connection():
+    """Conecta ao cache semântico."""
+    try:
+        from cache import SemanticCache, CacheConfig
+        cache = SemanticCache(CacheConfig())
+        cache._ensure_connected()
+        return cache
+    except Exception as e:
+        return None
+
+
+def page_cache():
+    """Página de monitoramento do cache semântico."""
+    st.header("Cache Semântico")
+
+    st.markdown("""
+    Monitoramento do **cache de respostas** do sistema RAG.
+
+    O cache usa embeddings para encontrar queries similares, evitando
+    reprocessamento e acelerando respostas para perguntas parecidas.
+    """)
+
+    st.divider()
+
+    # Tenta conectar ao cache
+    cache = get_cache_connection()
+
+    if not cache:
+        st.error("Cache não disponível. Verifique conexões com Milvus e Redis.")
+        st.info("""
+        O cache semântico requer:
+        - **Milvus**: Para busca por similaridade (túnel SSH para localhost:19530)
+        - **Redis**: Para armazenar respostas (localhost:6379)
+        """)
+        return
+
+    # Estatísticas básicas
+    st.subheader("Estatísticas Gerais")
+
+    try:
+        stats = cache.get_detailed_stats()
+
+        if "error" in stats:
+            st.error(f"Erro ao obter estatísticas: {stats['error']}")
+            return
+
+        # Métricas principais
+        col1, col2, col3, col4 = st.columns(4)
+
+        with col1:
+            st.metric("Queries Cacheadas", f"{stats.get('queries_cached', 0):,}")
+
+        with col2:
+            st.metric(
+                "Hit Rate",
+                f"{stats.get('hit_rate_pct', 0):.1f}%",
+                help="Porcentagem de consultas respondidas pelo cache"
+            )
+
+        with col3:
+            hits = stats.get('cache_hits', 0)
+            misses = stats.get('cache_misses', 0)
+            st.metric("Hits / Misses", f"{hits} / {misses}")
+
+        with col4:
+            st.metric("Memória Redis", stats.get('redis_memory', 'N/A'))
+
+        st.divider()
+
+        # Feedback (RLHF)
+        st.subheader("Feedback dos Usuários")
+
+        col1, col2, col3 = st.columns(3)
+
+        with col1:
+            total_likes = stats.get('total_likes', 0)
+            st.metric("👍 Likes", total_likes)
+
+        with col2:
+            total_dislikes = stats.get('total_dislikes', 0)
+            st.metric("👎 Dislikes", total_dislikes)
+
+        with col3:
+            approval = stats.get('approval_rate', 0)
+            st.metric(
+                "Taxa de Aprovação",
+                f"{approval:.1f}%",
+                delta="bom" if approval > 70 else ("médio" if approval > 50 else "baixo"),
+                delta_color="normal" if approval > 50 else "inverse"
+            )
+
+        st.divider()
+
+        # Gráfico de crescimento
+        st.subheader("Crescimento do Cache")
+
+        growth_data = cache.get_growth_data(days=30)
+
+        if growth_data:
+            df_growth = pd.DataFrame(growth_data)
+
+            col1, col2 = st.columns(2)
+
+            with col1:
+                st.write("**Queries adicionadas por dia**")
+                chart_df = df_growth[["date", "queries_added"]].set_index("date")
+                st.bar_chart(chart_df)
+
+            with col2:
+                st.write("**Total acumulado**")
+                chart_df = df_growth[["date", "total_cached"]].set_index("date")
+                st.line_chart(chart_df)
+
+        st.divider()
+
+        # Top queries (mais votadas)
+        st.subheader("Top Queries (Melhores Respostas)")
+
+        top_queries = stats.get("top_queries", [])
+        if top_queries:
+            top_df = pd.DataFrame(top_queries)
+            top_df = top_df[["query_text", "likes", "dislikes", "times_served", "score"]]
+            top_df.columns = ["Query", "👍", "👎", "Servidas", "Score"]
+            st.dataframe(top_df, hide_index=True, use_container_width=True)
+        else:
+            st.info("Nenhuma query com feedback ainda.")
+
+        # Worst queries (piores respostas)
+        st.subheader("Queries com Problemas (Candidatas a Revisão)")
+
+        worst_queries = stats.get("worst_queries", [])
+        if worst_queries:
+            worst_df = pd.DataFrame(worst_queries)
+            worst_df = worst_df[["query_text", "likes", "dislikes", "times_served", "score"]]
+            worst_df.columns = ["Query", "👍", "👎", "Servidas", "Score"]
+            st.dataframe(worst_df, hide_index=True, use_container_width=True)
+
+            st.warning("""
+            Queries com score negativo (mais dislikes que likes) podem indicar:
+            - Resposta incorreta ou incompleta
+            - Contexto insuficiente
+            - Problema de retrieval
+
+            Considere invalidar essas entradas ou investigar a causa.
+            """)
+        else:
+            st.success("Nenhuma query com feedback negativo!")
+
+        st.divider()
+
+        # Configurações do cache
+        st.subheader("Configurações")
+
+        col1, col2, col3 = st.columns(3)
+
+        with col1:
+            st.write(f"**Threshold de Similaridade:** {stats.get('similarity_threshold', 0.92)}")
+
+        with col2:
+            ttl_hours = stats.get('ttl_seconds', 86400) / 3600
+            st.write(f"**TTL:** {ttl_hours:.0f} horas")
+
+        with col3:
+            st.write(f"**Chaves no Redis:** {stats.get('redis_keys', 0)}")
+
+        st.divider()
+
+        # Ações
+        st.subheader("Ações")
+
+        col1, col2 = st.columns(2)
+
+        with col1:
+            if st.button("🔄 Atualizar Estatísticas", use_container_width=True):
+                st.rerun()
+
+        with col2:
+            if st.button("🗑️ Limpar Cache (CUIDADO!)", type="secondary", use_container_width=True):
+                if st.session_state.get("confirm_clear"):
+                    try:
+                        cache.clear()
+                        st.success("Cache limpo com sucesso!")
+                        st.session_state["confirm_clear"] = False
+                        st.rerun()
+                    except Exception as e:
+                        st.error(f"Erro ao limpar cache: {e}")
+                else:
+                    st.session_state["confirm_clear"] = True
+                    st.warning("Clique novamente para confirmar a limpeza do cache.")
+
+    except Exception as e:
+        st.error(f"Erro ao carregar dados do cache: {e}")
+        import traceback
+        st.code(traceback.format_exc())
+
+    finally:
+        if cache:
+            cache.close()
+
+
+# =============================================================================
 # MAIN
 # =============================================================================
 
@@ -1176,30 +1390,11 @@ def main():
 
     # Warmup dos modelos (executa apenas uma vez)
     with st.sidebar:
-        # Mostra modo atual
-        mode_label = "PRODUCTION" if is_production_mode() else "DEVELOPMENT"
-        mode_color = "green" if is_production_mode() else "blue"
-        st.markdown(f"**Modo:** :{mode_color}[{mode_label}]")
-
-        with st.spinner("Inicializando..."):
+        with st.spinner("Carregando modelos..."):
             models_status = init_models()
 
         if models_status["status"] == "ok":
-            mode = models_status.get("mode", "unknown")
-            load_time = models_status.get("load_time", 0.0)
-
-            if mode == "production":
-                st.success(f"Modelos na GPU ({load_time:.1f}s)")
-            else:
-                st.info("Modelos sob demanda (lazy loading)")
-
-            # Tooltip com detalhes
-            with st.expander("Detalhes do modo", expanded=False):
-                st.write(models_status.get("message", ""))
-                if mode == "development":
-                    st.caption("Para produção: export RAG_MODE=production")
-                else:
-                    st.caption("Para desenvolvimento: export RAG_MODE=development")
+            st.success(f"Modelos prontos ({models_status['load_time']:.1f}s)")
         else:
             st.error(f"Erro: {models_status.get('error', 'Desconhecido')}")
 
@@ -1207,7 +1402,7 @@ def main():
 
     page = st.sidebar.radio(
         "Navegacao",
-        ["Visao Geral", "Perguntar", "Busca", "Workers", "Ingestao", "Chunks"],
+        ["Visao Geral", "Perguntar", "Busca", "Cache", "Workers", "Ingestao", "Chunks"],
         index=1,  # Comeca na pagina Perguntar
     )
 
@@ -1221,6 +1416,8 @@ def main():
         page_ask()
     elif page == "Busca":
         page_search()
+    elif page == "Cache":
+        page_cache()
     elif page == "Workers":
         page_workers()
     elif page == "Ingestao":

@@ -292,67 +292,49 @@ python scripts/test_answer_generator.py --query "Sua pergunta"
 
 ---
 
-## 9. Próximos Passos (Sugestões)
+## 9. Cache Semantico (Implementado!)
 
-1. **Integrar warmup no Streamlit:** Adicionar `preload_models()` no startup do dashboard
-2. **Cache de embeddings:** Cachear embeddings de queries frequentes
-3. **Otimizar HyDE:** Considerar desabilitar HyDE para queries simples (economia de ~3-4s)
-4. **Milvus local:** Rodar Milvus no mesmo pod para eliminar latência de rede
+Apos a otimizacao de modelos, implementamos um **Cache Semantico com Busca Hibrida** que reduz ainda mais a latencia para queries similares.
+
+### Resultados do Cache
+
+| Cenario | Latencia | Melhoria |
+|---------|----------|----------|
+| Sem cache (warm) | ~10s | baseline |
+| Cache HIT | ~50ms | **99.5%** |
+
+### Como Funciona
+
+1. **Busca Hibrida**: Combina embeddings densos (semantica) + esparsos (keywords)
+2. **RRF Ranking**: Reciprocal Rank Fusion para combinar scores
+3. **Redis + Milvus**: Milvus armazena embeddings, Redis armazena respostas
+
+### Vantagem da Busca Hibrida
+
+```
+Query cacheada:  "O que diz o Art. 72?"
+Nova query:      "O que diz o Art. 75?"
+
+Busca apenas densa: Similaridade 0.96 → Retornaria ERRADO
+Busca hibrida:      RRF score 0.018 → NAO retorna (correto!)
+```
+
+**Documentacao completa:** `docs/CACHE_SEMANTICO.md`
 
 ---
 
-## 10. Conclusão
+## 10. Proximos Passos (Sugestoes)
+
+1. ~~**Integrar warmup no Streamlit:**~~ ✅ Feito
+2. ~~**Cache de respostas:**~~ ✅ Implementado (Cache Semantico)
+3. **Otimizar HyDE:** Considerar desabilitar HyDE para queries simples (economia de ~3-4s)
+4. **Milvus local:** Rodar Milvus no mesmo pod para eliminar latencia de rede
+5. **Fine-tuning:** Usar queries curadas do cache para fine-tuning do modelo
+
+---
+
+## 11. Conclusao
 
 A otimização de latência foi bem-sucedida, reduzindo o tempo de resposta de **~40s para ~10s** (melhoria de 75%). A causa raiz era o recarregamento desnecessário de modelos a cada requisição, resolvido com o padrão singleton.
 
 O aprendizado principal é que **modelos de ML devem ser tratados como recursos compartilhados** em aplicações de produção, não como objetos descartáveis criados a cada request.
-
----
-
-## 10. Modos de Operação: Desenvolvimento vs Produção
-
-### 10.1 Problema de VRAM
-
-A estratégia de singleton mantém os modelos na GPU permanentemente, o que requer VRAM disponível:
-
-| Componente | VRAM Necessária |
-|------------|-----------------|
-| vLLM (Qwen3-8B-AWQ) | ~6 GB |
-| BGE-M3 | ~1.5 GB |
-| BGE-Reranker | ~0.7 GB |
-| **Total** | **~8.2 GB** |
-
-### 10.2 Configuração por Ambiente
-
-| Ambiente | GPU | Modo | Variável |
-|----------|-----|------|----------|
-| **Desenvolvimento** | RTX 4070 12GB | Lazy loading | `RAG_MODE=development` |
-| **Produção/Testes** | A100 80GB | Singleton | `RAG_MODE=production` |
-
-### 10.3 Como Alternar
-
-```bash
-# Desenvolvimento (padrão) - carrega modelos sob demanda
-export RAG_MODE=development
-
-# Produção - mantém modelos na GPU permanentemente
-export RAG_MODE=production
-```
-
-### 10.4 Comportamento por Modo
-
-**Modo Desenvolvimento (`RAG_MODE=development`):**
-- Modelos carregados sob demanda (lazy loading)
-- Cada instância cria seus próprios objetos
-- Maior latência por query (~30-40s)
-- Menor uso de VRAM (libera após uso)
-- Ideal para GPUs com 12GB ou menos
-
-**Modo Produção (`RAG_MODE=production`):**
-- Modelos mantidos como singletons na GPU
-- Reutiliza instâncias entre requisições
-- Menor latência após warmup (~10s)
-- Maior uso de VRAM (permanente)
-- Requer GPU com 24GB+ (recomendado 40GB+)
-
-**Importante:** A estratégia de singleton só é viável em GPUs com VRAM suficiente. Para desenvolvimento em GPUs menores (12GB), usar o modo `development` que carrega modelos sob demanda.

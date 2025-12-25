@@ -99,8 +99,12 @@ class AnswerMetadata:
     chunks_used: int = 0
     timestamp: str = field(default_factory=lambda: datetime.utcnow().isoformat())
 
+    # Cache semântico
+    from_cache: bool = False
+    cache_similarity: float = 0.0
+
     def to_dict(self) -> dict:
-        return {
+        result = {
             "model": self.model,
             "latency_ms": self.latency_ms,
             "tokens_used": self.tokens_prompt + self.tokens_completion,
@@ -110,6 +114,24 @@ class AnswerMetadata:
             "chunks_used": self.chunks_used,
             "timestamp": self.timestamp,
         }
+        if self.from_cache:
+            result["from_cache"] = True
+            result["cache_similarity"] = round(self.cache_similarity, 4)
+        return result
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "AnswerMetadata":
+        return cls(
+            model=data.get("model", ""),
+            latency_ms=data.get("latency_ms", 0),
+            retrieval_ms=data.get("retrieval_ms", 0),
+            generation_ms=data.get("generation_ms", 0),
+            chunks_retrieved=data.get("chunks_retrieved", 0),
+            chunks_used=data.get("chunks_used", 0),
+            timestamp=data.get("timestamp", ""),
+            from_cache=data.get("from_cache", False),
+            cache_similarity=data.get("cache_similarity", 0.0),
+        )
 
 
 @dataclass
@@ -171,6 +193,46 @@ class AnswerResponse:
         """Serializa para JSON."""
         import json
         return json.dumps(self.to_dict(), ensure_ascii=False, indent=2)
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "AnswerResponse":
+        """Reconstrói AnswerResponse a partir de dicionário (ex: do cache)."""
+        from .citation_formatter import Citation
+
+        # Extrai data aninhado se existir
+        inner_data = data.get("data", data)
+
+        # Reconstrói citações
+        citations = []
+        for c in inner_data.get("citations", []):
+            if isinstance(c, dict):
+                citations.append(Citation(
+                    span_id=c.get("span_id", ""),
+                    chunk_id=c.get("chunk_id", ""),
+                    text=c.get("text", ""),
+                    relevance=c.get("relevance", 0.0),
+                    article=c.get("article", ""),
+                    document_type=c.get("document_type", ""),
+                    document_number=c.get("document_number", ""),
+                    year=c.get("year", 0),
+                    device=c.get("device", ""),
+                    device_number=c.get("device_number", ""),
+                ))
+
+        # Reconstrói metadata
+        metadata_dict = data.get("metadata", {})
+        metadata = AnswerMetadata.from_dict(metadata_dict)
+
+        return cls(
+            success=data.get("success", True),
+            error=data.get("error"),
+            query=data.get("query", ""),
+            answer=inner_data.get("answer", ""),
+            confidence=inner_data.get("confidence", 0.0),
+            citations=citations,
+            sources=inner_data.get("sources", []),
+            metadata=metadata,
+        )
 
 
 @dataclass

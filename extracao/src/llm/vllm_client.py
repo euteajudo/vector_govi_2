@@ -41,7 +41,7 @@ class LLMConfig:
     timeout: float = 120.0  # segundos
 
     # Modelo
-    model: str = "Qwen/Qwen3-8B-AWQ"  # Modelo padrao (quantizado)
+    model: str = "stelterlab/Qwen3-30B-A3B-Instruct-2507-AWQ"  # Modelo padrao
 
     # Geracao
     temperature: float = 0.0
@@ -53,7 +53,7 @@ class LLMConfig:
     retry_delay: float = 1.0
 
     @classmethod
-    def for_enrichment(cls, model: str = "Qwen/Qwen3-8B-AWQ") -> "LLMConfig":
+    def for_enrichment(cls, model: str = "stelterlab/Qwen3-30B-A3B-Instruct-2507-AWQ") -> "LLMConfig":
         """Config otimizada para enriquecimento de chunks."""
         return cls(
             model=model,
@@ -63,7 +63,7 @@ class LLMConfig:
         )
 
     @classmethod
-    def for_extraction(cls, model: str = "Qwen/Qwen3-8B-AWQ") -> "LLMConfig":
+    def for_extraction(cls, model: str = "stelterlab/Qwen3-30B-A3B-Instruct-2507-AWQ") -> "LLMConfig":
         """Config para extracao estruturada (JSON complexo)."""
         return cls(
             model=model,

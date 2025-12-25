@@ -34,7 +34,7 @@ class GenerationConfig:
     """Configuracao para geracao de resposta."""
 
     # Modelo LLM
-    model: str = "Qwen/Qwen3-8B-AWQ"
+    model: str = "stelterlab/Qwen3-30B-A3B-Instruct-2507-AWQ"
     temperature: float = 0.3
     max_tokens: int = 2048
 
@@ -49,6 +49,10 @@ class GenerationConfig:
 
     # Collection
     collection_name: str = "leis_v3"
+
+    # Cache semântico
+    use_cache: bool = True
+    cache_similarity_threshold: float = 0.92
 
     @classmethod
     def default(cls) -> "GenerationConfig":
@@ -65,6 +69,11 @@ class GenerationConfig:
             use_hyde=False,
             use_reranker=False,
         )
+
+    @classmethod
+    def with_cache(cls) -> "GenerationConfig":
+        """Configuracao com cache semantico ativado."""
+        return cls(use_cache=True)
 
 
 @dataclass
@@ -118,6 +127,8 @@ class AnswerGenerator:
 
     Combina HybridSearcher para retrieval com vLLM para generation,
     produzindo respostas com citacoes formatadas.
+
+    Suporta cache semantico opcional para acelerar queries similares.
     """
 
     def __init__(
@@ -125,6 +136,7 @@ class AnswerGenerator:
         config: Optional[GenerationConfig] = None,
         searcher=None,
         llm_client=None,
+        cache=None,
     ):
         """
         Inicializa o gerador.
@@ -133,10 +145,12 @@ class AnswerGenerator:
             config: Configuracao de geracao
             searcher: HybridSearcher (cria novo se nao fornecido)
             llm_client: VLLMClient (cria novo se nao fornecido)
+            cache: SemanticCache (cria novo se use_cache=True)
         """
         self.config = config or GenerationConfig.default()
         self._searcher = searcher
         self._llm_client = llm_client
+        self._cache = cache
         self._citation_formatter = CitationFormatter()
 
     # =========================================================================
@@ -174,6 +188,26 @@ class AnswerGenerator:
             self._llm_client = VLLMClient(config=llm_config)
         return self._llm_client
 
+    @property
+    def cache(self):
+        """Carrega cache semantico sob demanda."""
+        if self._cache is None and self.config.use_cache:
+            try:
+                from cache import SemanticCache, CacheConfig
+
+                logger.info("Carregando cache semantico...")
+                cache_config = CacheConfig(
+                    similarity_threshold=self.config.cache_similarity_threshold
+                )
+                self._cache = SemanticCache(config=cache_config)
+                # Testa conexão
+                self._cache._ensure_connected()
+            except Exception as e:
+                logger.warning(f"Cache nao disponivel (degradando gracefully): {e}")
+                self._cache = None
+                self.config.use_cache = False  # Desativa para não tentar novamente
+        return self._cache
+
     # =========================================================================
     # GERACAO PRINCIPAL
     # =========================================================================
@@ -183,6 +217,7 @@ class AnswerGenerator:
         query: str,
         top_k: Optional[int] = None,
         filters=None,
+        skip_cache: bool = False,
     ) -> AnswerResponse:
         """
         Gera resposta completa para a pergunta.
@@ -191,12 +226,36 @@ class AnswerGenerator:
             query: Pergunta do usuario
             top_k: Numero de chunks para contexto
             filters: Filtros de busca (SearchFilter)
+            skip_cache: Se True, ignora cache e forca nova geracao
 
         Returns:
             AnswerResponse com resposta e citacoes
         """
         start_time = time.perf_counter()
         top_k = top_k or self.config.top_k
+
+        # 0. Verifica cache semantico
+        if self.config.use_cache and not skip_cache and self.cache:
+            cached = self.cache.get(query)
+            if cached:
+                # Reconstroi AnswerResponse do cache
+                cache_info = cached.pop("_cache", {})
+                try:
+                    from .answer_models import AnswerResponse
+                    response = AnswerResponse.from_dict(cached)
+                    response.metadata.from_cache = True
+                    # Suporta tanto similarity (v1) quanto rrf_score (v2 híbrido)
+                    score = cache_info.get("rrf_score") or cache_info.get("similarity", 0)
+                    response.metadata.cache_similarity = score
+                    response.metadata.latency_ms = int(cache_info.get("latency_ms", 0))
+                    search_type = cache_info.get("search_type", "dense")
+                    logger.info(
+                        f"Cache HIT ({search_type}, score={score:.4f}): "
+                        f"{query[:50]}..."
+                    )
+                    return response
+                except Exception as e:
+                    logger.warning(f"Erro ao reconstruir resposta do cache: {e}")
 
         # 1. Retrieval
         logger.info(f"Buscando contexto para: {query[:50]}...")
@@ -241,7 +300,7 @@ class AnswerGenerator:
             chunks_used=len(context.citations),
         )
 
-        return AnswerResponse(
+        response = AnswerResponse(
             success=True,
             query=query,
             answer=answer_text,
@@ -250,6 +309,16 @@ class AnswerGenerator:
             sources=sources,
             metadata=metadata,
         )
+
+        # 7. Salvar no cache semantico
+        if self.config.use_cache and self.cache:
+            try:
+                self.cache.set(query, response.to_dict())
+                logger.debug(f"Resposta salva no cache: {query[:50]}...")
+            except Exception as e:
+                logger.warning(f"Erro ao salvar no cache: {e}")
+
+        return response
 
     # =========================================================================
     # METODOS AUXILIARES
