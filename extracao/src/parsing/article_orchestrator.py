@@ -141,7 +141,7 @@ class OrchestratorConfig:
 # PROMPTS
 # =============================================================================
 
-ARTICLE_SYSTEM_PROMPT = """Você é um especialista em documentos legais brasileiros.
+ARTICLE_SYSTEM_PROMPT = """Você é um especialista em documentos legais brasileiros. /no_think
 
 Você receberá o texto de UM ÚNICO ARTIGO com marcações de span no formato:
 [SPAN_ID] texto do span

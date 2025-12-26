@@ -36,6 +36,7 @@ from milvus.schema_v3 import COLLECTION_NAME_V3
 from dashboard import MetricsCollector, generate_dashboard_report
 from pod.config import PodConfig, get_pod_config
 from pod.gpu_client import GPUClient
+from validation import PostIngestionValidator
 
 logging.basicConfig(
     level=logging.INFO,
@@ -47,7 +48,7 @@ logger = logging.getLogger(__name__)
 class GPUClientLLMAdapter:
     """Adaptador para usar GPUClient como LLM client no ArticleOrchestrator."""
 
-    def __init__(self, gpu_client: GPUClient, model: str = "qwen3-30b"):
+    def __init__(self, gpu_client: GPUClient, model: str = "qwen3-8b"):
         self.client = gpu_client
         self.model = model
 
@@ -71,6 +72,39 @@ class GPUClientLLMAdapter:
             "usage": result.get("usage", {}),
         }
 
+    def chat_with_schema(
+        self,
+        messages: list[dict],
+        schema: dict,
+        temperature: float = 0.0,
+        max_tokens: int = 512,
+    ) -> dict:
+        """Chat com guided JSON usando json_schema.
+
+        Retorna o JSON parseado diretamente (nao o wrapper do chat).
+        Compativel com VLLMClient.chat_with_schema().
+        """
+        import json
+
+        response_format = {
+            "type": "json_schema",
+            "json_schema": {
+                "name": "article_spans",
+                "strict": True,
+                "schema": schema
+            }
+        }
+        result = self.chat(
+            messages=messages,
+            temperature=temperature,
+            max_tokens=max_tokens,
+            response_format=response_format,
+        )
+
+        # Extrai content e parseia como JSON
+        content = result.get("content", "{}")
+        return json.loads(content)
+
     def list_models(self) -> list[str]:
         return self.client.list_models()
 
@@ -89,10 +123,13 @@ def compute_file_hash(file_path: Path) -> str:
 
 def insert_into_milvus_v3(chunks: list, collection_name: str = COLLECTION_NAME_V3):
     """Insere chunks na collection v3."""
+    import os
     from pymilvus import connections, Collection
 
-    logger.info("Conectando ao Milvus local...")
-    connections.connect(host="localhost", port="19530")
+    milvus_host = os.getenv("MILVUS_HOST", "77.37.43.160")
+    milvus_port = os.getenv("MILVUS_PORT", "19530")
+    logger.info(f"Conectando ao Milvus ({milvus_host}:{milvus_port})...")
+    connections.connect(host=milvus_host, port=milvus_port)
 
     collection = Collection(collection_name)
 
@@ -194,6 +231,8 @@ def run_pipeline_http(
     use_llm: bool = True,
     use_embeddings: bool = True,
     use_milvus: bool = True,
+    validate: bool = True,
+    auto_fix: bool = True,
 ):
     """
     Executa pipeline v3 usando GPU Server via HTTP direto.
@@ -208,6 +247,8 @@ def run_pipeline_http(
         use_llm: Se deve usar LLM para extracao
         use_embeddings: Se deve gerar embeddings
         use_milvus: Se deve inserir no Milvus
+        validate: Se deve validar chunks apos insercao
+        auto_fix: Se deve corrigir erros automaticamente
     """
     print("=" * 70)
     print("PIPELINE V3 - HTTP DIRETO (SEM SSH TUNNEL)")
@@ -222,7 +263,7 @@ def run_pipeline_http(
     gpu_client = GPUClient(gpu_url)
 
     # Verifica conexao
-    print("\n[0/6] Verificando conexao com GPU Server...")
+    print("\n[0/7] Verificando conexao com GPU Server...")
     health = gpu_client.health_check()
     if health.get("status") != "ok":
         print(f"      ERRO: GPU Server offline ou inacessivel")
@@ -246,7 +287,7 @@ def run_pipeline_http(
     )
 
     # 1. Carrega markdown
-    print("\n[1/6] Carregando markdown...")
+    print("\n[1/7] Carregando markdown...")
     collector.start_phase("load")
 
     if not markdown_path.exists():
@@ -263,7 +304,7 @@ def run_pipeline_http(
     collector.end_phase("load", items_processed=1)
 
     # 2. Parseia com SpanParser (local - nao precisa GPU)
-    print("\n[2/6] Parseando com SpanParser...")
+    print("\n[2/7] Parseando com SpanParser...")
     collector.start_phase("parsing")
     parse_start = time.time()
 
@@ -279,7 +320,7 @@ def run_pipeline_http(
 
     # 3. Extrai hierarquia com LLM (GPU Server)
     if use_llm and health.get('vllm_available'):
-        print("\n[3/6] Extraindo hierarquia com LLM (GPU Server)...")
+        print("\n[3/7] Extraindo hierarquia com LLM (GPU Server)...")
         collector.start_phase("extraction")
         extract_start = time.time()
 
@@ -323,14 +364,14 @@ def run_pipeline_http(
         collector.end_phase("extraction", items_processed=extraction_result.total_articles)
     else:
         if not health.get('vllm_available'):
-            print("\n[3/6] vLLM offline - pulando extracao...")
+            print("\n[3/7] vLLM offline - pulando extracao...")
         else:
-            print("\n[3/6] Pulando extracao LLM...")
+            print("\n[3/7] Pulando extracao LLM...")
         extraction_result = None
         collector.end_phase("extraction", items_processed=0)
 
     # 4. Materializa chunks (local)
-    print("\n[4/6] Materializando chunks parent-child...")
+    print("\n[4/7] Materializando chunks parent-child...")
     collector.start_phase("materialization")
     mat_start = time.time()
 
@@ -400,7 +441,7 @@ def run_pipeline_http(
 
     # 5. Gera embeddings (GPU Server)
     if use_embeddings and health.get('embedding_model_loaded'):
-        print("\n[5/6] Gerando embeddings via GPU Server...")
+        print("\n[5/7] Gerando embeddings via GPU Server...")
         collector.start_phase("embedding")
         embed_start = time.time()
 
@@ -436,11 +477,11 @@ def run_pipeline_http(
             traceback.print_exc()
             collector.end_phase("embedding", errors=1)
     else:
-        print("\n[5/6] Pulando embeddings...")
+        print("\n[5/7] Pulando embeddings...")
 
     # 6. Insere no Milvus (local)
     if use_milvus and all_chunks and use_embeddings:
-        print("\n[6/6] Inserindo no Milvus local...")
+        print("\n[6/7] Inserindo no Milvus local...")
         collector.start_phase("indexing")
         index_start = time.time()
 
@@ -456,7 +497,44 @@ def run_pipeline_http(
             collector.end_phase("indexing", errors=1)
             collector.set_error(str(e))
     else:
-        print("\n[6/6] Pulando insercao no Milvus")
+        print("\n[6/7] Pulando insercao no Milvus")
+
+    # 7. Validacao pos-ingestao
+    validation_result = None
+    if validate and use_milvus and all_chunks:
+        print("\n[7/7] Validando chunks inseridos...")
+        collector.start_phase("validation")
+        val_start = time.time()
+
+        try:
+            validator = PostIngestionValidator(
+                gpu_server=gpu_url,
+                milvus_host="77.37.43.160",
+            )
+            validation_result = validator.validate_document(document_id, auto_fix=auto_fix)
+
+            val_time = time.time() - val_start
+            print(f"      Total chunks: {validation_result.total_chunks}")
+            print(f"      Validos: {validation_result.valid_chunks} ({validation_result.success_rate:.1%})")
+            print(f"      Erros encontrados: {len(validation_result.errors)}")
+            print(f"      Corrigidos: {len(validation_result.fixed_chunks)}")
+            print(f"      Nao corrigiveis: {len(validation_result.unfixable_chunks)}")
+            print(f"      Tempo: {val_time:.2f}s")
+
+            if validation_result.unfixable_chunks:
+                print("\n      [ATENCAO] Chunks que precisam de revisao manual:")
+                for chunk_id in validation_result.unfixable_chunks:
+                    print(f"        - {chunk_id}")
+
+            collector.end_phase("validation", items_processed=validation_result.total_chunks)
+
+        except Exception as e:
+            print(f"      ERRO na validacao: {e}")
+            import traceback
+            traceback.print_exc()
+            collector.end_phase("validation", errors=1)
+    else:
+        print("\n[7/7] Pulando validacao")
 
     # Cleanup
     gpu_client.close()
@@ -500,6 +578,8 @@ def main():
     parser.add_argument("--no-llm", action="store_true", help="Nao usar LLM para extracao")
     parser.add_argument("--no-embeddings", action="store_true", help="Nao gerar embeddings")
     parser.add_argument("--no-milvus", action="store_true", help="Nao inserir no Milvus")
+    parser.add_argument("--no-validate", action="store_true", help="Nao validar apos insercao")
+    parser.add_argument("--no-fix", action="store_true", help="Nao corrigir erros automaticamente")
 
     args = parser.parse_args()
 
@@ -516,6 +596,8 @@ def main():
             use_llm=not args.no_llm,
             use_embeddings=not args.no_embeddings,
             use_milvus=not args.no_milvus,
+            validate=not args.no_validate,
+            auto_fix=not args.no_fix,
         )
         return 0
     except Exception as e:
