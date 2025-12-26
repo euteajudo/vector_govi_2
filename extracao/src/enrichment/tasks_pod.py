@@ -49,7 +49,7 @@ app.conf.update(
 logger = logging.getLogger(__name__)
 
 # Configuracao POD - GPU local, Milvus remoto
-GPU_SERVER_URL = os.getenv("GPU_SERVER_URL", "http://localhost:8000")  # LOCAL!
+GPU_SERVER_URL = os.getenv("GPU_SERVER_URL", "http://localhost:8080")  # GPU Server (8080)
 LLM_MODEL = os.getenv("LLM_MODEL", "qwen3-8b")
 MILVUS_HOST = os.getenv("MILVUS_HOST", "77.37.43.160")  # VPS
 MILVUS_PORT = os.getenv("MILVUS_PORT", "19530")
