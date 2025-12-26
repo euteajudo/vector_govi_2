@@ -54,6 +54,21 @@ LLM_MODEL = os.getenv("LLM_MODEL", "qwen3-8b")
 MILVUS_HOST = os.getenv("MILVUS_HOST", "77.37.43.160")  # VPS
 MILVUS_PORT = os.getenv("MILVUS_PORT", "19530")
 
+# System prompt para desabilitar thinking e forçar português
+SYSTEM_PROMPT = "Você é um assistente especializado em direito administrativo brasileiro. Responda sempre em português do Brasil, de forma direta e concisa. /no_think"
+
+
+def clean_llm_response(text: str) -> str:
+    """Remove tags <think>...</think> e limpa a resposta do LLM."""
+    import re
+    # Remove <think>...</think> incluindo conteúdo
+    text = re.sub(r'<think>.*?</think>', '', text, flags=re.DOTALL)
+    # Remove <think> sozinho (caso não fechado)
+    text = re.sub(r'<think>.*', '', text, flags=re.DOTALL)
+    # Remove espaços extras
+    text = text.strip()
+    return text
+
 
 @app.task(bind=True, max_retries=3, default_retry_delay=30)
 def enrich_chunk_pod(
@@ -78,8 +93,7 @@ def enrich_chunk_pod(
 
     try:
         # 1. Gera context_header via vLLM LOCAL
-        context_prompt = f"""Voce e um especialista em direito administrativo brasileiro.
-Dado o seguinte trecho de {document_type} {number}/{year}, Art. {article_number}:
+        context_prompt = f"""Dado o seguinte trecho de {document_type} {number}/{year}, Art. {article_number}:
 
 {text[:2000]}
 
@@ -89,14 +103,17 @@ Responda APENAS com a frase, sem explicacoes."""
         context_resp = requests.post(
             f"{GPU_SERVER_URL}/llm/chat",
             json={
-                "messages": [{"role": "user", "content": context_prompt}],
+                "messages": [
+                    {"role": "system", "content": SYSTEM_PROMPT},
+                    {"role": "user", "content": context_prompt}
+                ],
                 "temperature": 0.0,
                 "max_tokens": 100,
             },
             timeout=60,
         )
         context_resp.raise_for_status()
-        context_header = context_resp.json()["content"].strip()
+        context_header = clean_llm_response(context_resp.json()["content"])
 
         # 2. Gera thesis via vLLM LOCAL
         thesis_prompt = f"""Analise este dispositivo legal:
@@ -113,14 +130,17 @@ Exemplo: procedimento: Define os passos para elaboracao do ETP"""
         thesis_resp = requests.post(
             f"{GPU_SERVER_URL}/llm/chat",
             json={
-                "messages": [{"role": "user", "content": thesis_prompt}],
+                "messages": [
+                    {"role": "system", "content": SYSTEM_PROMPT},
+                    {"role": "user", "content": thesis_prompt}
+                ],
                 "temperature": 0.0,
                 "max_tokens": 150,
             },
             timeout=60,
         )
         thesis_resp.raise_for_status()
-        thesis_response = thesis_resp.json()["content"].strip()
+        thesis_response = clean_llm_response(thesis_resp.json()["content"])
 
         # Parse thesis
         thesis_type = "disposicao"
@@ -132,7 +152,7 @@ Exemplo: procedimento: Define os passos para elaboracao do ETP"""
                 thesis_text = parts[1].strip()
 
         # 3. Gera perguntas sinteticas
-        questions_prompt = f"""Liste 3 perguntas que este artigo responde:
+        questions_prompt = f"""Liste 3 perguntas em português que este artigo responde:
 
 {text[:1500]}
 
@@ -141,14 +161,17 @@ Formato: uma pergunta por linha, terminando com ?"""
         questions_resp = requests.post(
             f"{GPU_SERVER_URL}/llm/chat",
             json={
-                "messages": [{"role": "user", "content": questions_prompt}],
+                "messages": [
+                    {"role": "system", "content": SYSTEM_PROMPT},
+                    {"role": "user", "content": questions_prompt}
+                ],
                 "temperature": 0.0,
                 "max_tokens": 200,
             },
             timeout=60,
         )
         questions_resp.raise_for_status()
-        questions_raw = questions_resp.json()["content"].strip()
+        questions_raw = clean_llm_response(questions_resp.json()["content"])
 
         synthetic_questions = [
             q.strip().lstrip("0123456789.-) ")
