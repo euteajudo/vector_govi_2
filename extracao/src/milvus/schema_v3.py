@@ -214,32 +214,6 @@ def create_legal_chunks_schema_v3() -> CollectionSchema:
             description="SHA-256 do PDF original"
         ),
 
-        # === Page Spans (coordenadas PDF) ===
-        FieldSchema(
-            name="page",
-            dtype=DataType.INT64,
-            description="Numero da pagina no PDF"
-        ),
-        FieldSchema(
-            name="bbox_left",
-            dtype=DataType.FLOAT,
-            description="Bounding box left"
-        ),
-        FieldSchema(
-            name="bbox_top",
-            dtype=DataType.FLOAT,
-            description="Bounding box top"
-        ),
-        FieldSchema(
-            name="bbox_right",
-            dtype=DataType.FLOAT,
-            description="Bounding box right"
-        ),
-        FieldSchema(
-            name="bbox_bottom",
-            dtype=DataType.FLOAT,
-            description="Bounding box bottom"
-        ),
     ]
 
     schema = CollectionSchema(
@@ -323,6 +297,3 @@ if __name__ == "__main__":
     print("Novos campos (proveniencia):")
     print("  - schema_version, extractor_version")
     print("  - ingestion_timestamp, document_hash")
-    print()
-    print("Novos campos (page spans):")
-    print("  - page, bbox_left, bbox_top, bbox_right, bbox_bottom")

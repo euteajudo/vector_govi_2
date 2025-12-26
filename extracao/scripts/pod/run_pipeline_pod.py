@@ -110,11 +110,6 @@ def insert_into_milvus_v3(chunks: list, collection_name: str = COLLECTION_NAME_V
         "extractor_version": [],
         "ingestion_timestamp": [],
         "document_hash": [],
-        "page": [],
-        "bbox_left": [],
-        "bbox_top": [],
-        "bbox_right": [],
-        "bbox_bottom": [],
     }
 
     for chunk in chunks:
@@ -163,13 +158,6 @@ def insert_into_milvus_v3(chunks: list, collection_name: str = COLLECTION_NAME_V
         data["extractor_version"].append(meta.extractor_version or "1.0.0")
         data["ingestion_timestamp"].append(meta.ingestion_timestamp or datetime.utcnow().isoformat())
         data["document_hash"].append(meta.document_hash or "")
-
-        # Page spans
-        data["page"].append(0)
-        data["bbox_left"].append(0.0)
-        data["bbox_top"].append(0.0)
-        data["bbox_right"].append(0.0)
-        data["bbox_bottom"].append(0.0)
 
     logger.info(f"Inserindo {len(chunks)} chunks no Milvus...")
 

@@ -208,11 +208,6 @@ def enrich_chunk_http(
             "extractor_version": chunk["extractor_version"],
             "ingestion_timestamp": chunk["ingestion_timestamp"],
             "document_hash": chunk["document_hash"],
-            "page": chunk["page"],
-            "bbox_left": chunk["bbox_left"],
-            "bbox_top": chunk["bbox_top"],
-            "bbox_right": chunk["bbox_right"],
-            "bbox_bottom": chunk["bbox_bottom"],
         }
 
         # Delete e insert (upsert)

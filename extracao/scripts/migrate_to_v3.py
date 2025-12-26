@@ -130,9 +130,6 @@ def migrate_to_v3(
     print("Novos campos proveniencia:")
     print("  - schema_version, extractor_version")
     print("  - ingestion_timestamp, document_hash")
-    print()
-    print("Novos campos page spans:")
-    print("  - page, bbox_left, bbox_top, bbox_right, bbox_bottom")
 
     # Desconecta
     connections.disconnect("default")

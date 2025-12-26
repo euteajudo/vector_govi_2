@@ -74,10 +74,13 @@ def compute_file_hash(file_path: Path) -> str:
 
 def insert_into_milvus_v3(chunks: list, collection_name: str = COLLECTION_NAME_V3):
     """Insere chunks na collection v3."""
+    import os
     from pymilvus import connections, Collection
 
-    logger.info(f"Conectando ao Milvus...")
-    connections.connect(host="localhost", port="19530")
+    milvus_host = os.getenv("MILVUS_HOST", "77.37.43.160")  # VPS por padrão
+    milvus_port = os.getenv("MILVUS_PORT", "19530")
+    logger.info(f"Conectando ao Milvus ({milvus_host}:{milvus_port})...")
+    connections.connect(host=milvus_host, port=milvus_port)
 
     collection = Collection(collection_name)
 
@@ -107,11 +110,6 @@ def insert_into_milvus_v3(chunks: list, collection_name: str = COLLECTION_NAME_V
         "extractor_version": [],
         "ingestion_timestamp": [],
         "document_hash": [],
-        "page": [],
-        "bbox_left": [],
-        "bbox_top": [],
-        "bbox_right": [],
-        "bbox_bottom": [],
     }
 
     for chunk in chunks:
@@ -163,13 +161,6 @@ def insert_into_milvus_v3(chunks: list, collection_name: str = COLLECTION_NAME_V
         data["extractor_version"].append(meta.extractor_version or "1.0.0")
         data["ingestion_timestamp"].append(meta.ingestion_timestamp or datetime.utcnow().isoformat())
         data["document_hash"].append(meta.document_hash or "")
-
-        # Page spans (placeholder por enquanto)
-        data["page"].append(0)
-        data["bbox_left"].append(0.0)
-        data["bbox_top"].append(0.0)
-        data["bbox_right"].append(0.0)
-        data["bbox_bottom"].append(0.0)
 
     logger.info(f"Inserindo {len(chunks)} chunks no Milvus...")
 

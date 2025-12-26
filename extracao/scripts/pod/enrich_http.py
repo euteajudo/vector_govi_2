@@ -179,11 +179,6 @@ def update_chunk_in_milvus(collection: Collection, chunk: dict, enrichment: dict
         "extractor_version": chunk.get("extractor_version", "1.0.0"),
         "ingestion_timestamp": chunk.get("ingestion_timestamp", ""),
         "document_hash": chunk.get("document_hash", ""),
-        "page": chunk.get("page", 0),
-        "bbox_left": chunk.get("bbox_left", 0.0),
-        "bbox_top": chunk.get("bbox_top", 0.0),
-        "bbox_right": chunk.get("bbox_right", 0.0),
-        "bbox_bottom": chunk.get("bbox_bottom", 0.0),
     }
 
     # Delete e insert
