@@ -87,9 +87,8 @@ Escreva UMA FRASE curta (max 50 palavras) que contextualize este artigo no docum
 Responda APENAS com a frase, sem explicacoes."""
 
         context_resp = requests.post(
-            f"{GPU_SERVER_URL}/v1/chat/completions",
+            f"{GPU_SERVER_URL}/llm/chat",
             json={
-                "model": LLM_MODEL,
                 "messages": [{"role": "user", "content": context_prompt}],
                 "temperature": 0.0,
                 "max_tokens": 100,
@@ -97,7 +96,7 @@ Responda APENAS com a frase, sem explicacoes."""
             timeout=60,
         )
         context_resp.raise_for_status()
-        context_header = context_resp.json()["choices"][0]["message"]["content"].strip()
+        context_header = context_resp.json()["response"].strip()
 
         # 2. Gera thesis via vLLM LOCAL
         thesis_prompt = f"""Analise este dispositivo legal:
@@ -112,9 +111,8 @@ Formato: TIPO: resumo
 Exemplo: procedimento: Define os passos para elaboracao do ETP"""
 
         thesis_resp = requests.post(
-            f"{GPU_SERVER_URL}/v1/chat/completions",
+            f"{GPU_SERVER_URL}/llm/chat",
             json={
-                "model": LLM_MODEL,
                 "messages": [{"role": "user", "content": thesis_prompt}],
                 "temperature": 0.0,
                 "max_tokens": 150,
@@ -122,7 +120,7 @@ Exemplo: procedimento: Define os passos para elaboracao do ETP"""
             timeout=60,
         )
         thesis_resp.raise_for_status()
-        thesis_response = thesis_resp.json()["choices"][0]["message"]["content"].strip()
+        thesis_response = thesis_resp.json()["response"].strip()
 
         # Parse thesis
         thesis_type = "disposicao"
@@ -141,9 +139,8 @@ Exemplo: procedimento: Define os passos para elaboracao do ETP"""
 Formato: uma pergunta por linha, terminando com ?"""
 
         questions_resp = requests.post(
-            f"{GPU_SERVER_URL}/v1/chat/completions",
+            f"{GPU_SERVER_URL}/llm/chat",
             json={
-                "model": LLM_MODEL,
                 "messages": [{"role": "user", "content": questions_prompt}],
                 "temperature": 0.0,
                 "max_tokens": 200,
@@ -151,7 +148,7 @@ Formato: uma pergunta por linha, terminando com ?"""
             timeout=60,
         )
         questions_resp.raise_for_status()
-        questions_raw = questions_resp.json()["choices"][0]["message"]["content"].strip()
+        questions_raw = questions_resp.json()["response"].strip()
 
         synthetic_questions = [
             q.strip().lstrip("0123456789.-) ")
@@ -166,9 +163,9 @@ Formato: uma pergunta por linha, terminando com ?"""
             enriched_text += "\n".join(f"- {q}" for q in synthetic_questions)
             enriched_text += "]"
 
-        # 5. Gera embeddings via GPU Server LOCAL (endpoint /embed_hybrid)
+        # 5. Gera embeddings via GPU Server LOCAL (endpoint /embed/hybrid)
         embed_resp = requests.post(
-            f"{GPU_SERVER_URL}/embed_hybrid",
+            f"{GPU_SERVER_URL}/embed/hybrid",
             json={"texts": [enriched_text]},
             timeout=120,
         )
@@ -180,7 +177,7 @@ Formato: uma pergunta por linha, terminando com ?"""
         # Thesis vector
         if thesis_text:
             thesis_embed_resp = requests.post(
-                f"{GPU_SERVER_URL}/embed_hybrid",
+                f"{GPU_SERVER_URL}/embed/hybrid",
                 json={"texts": [thesis_text]},
                 timeout=60,
             )
