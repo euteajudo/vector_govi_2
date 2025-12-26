@@ -96,7 +96,7 @@ Responda APENAS com a frase, sem explicacoes."""
             timeout=60,
         )
         context_resp.raise_for_status()
-        context_header = context_resp.json()["response"].strip()
+        context_header = context_resp.json()["content"].strip()
 
         # 2. Gera thesis via vLLM LOCAL
         thesis_prompt = f"""Analise este dispositivo legal:
@@ -120,7 +120,7 @@ Exemplo: procedimento: Define os passos para elaboracao do ETP"""
             timeout=60,
         )
         thesis_resp.raise_for_status()
-        thesis_response = thesis_resp.json()["response"].strip()
+        thesis_response = thesis_resp.json()["content"].strip()
 
         # Parse thesis
         thesis_type = "disposicao"
@@ -148,7 +148,7 @@ Formato: uma pergunta por linha, terminando com ?"""
             timeout=60,
         )
         questions_resp.raise_for_status()
-        questions_raw = questions_resp.json()["response"].strip()
+        questions_raw = questions_resp.json()["content"].strip()
 
         synthetic_questions = [
             q.strip().lstrip("0123456789.-) ")
